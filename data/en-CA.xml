@@ -1,0 +1,285 @@
+<!-- login and language prompts -->
+<translation>
+  <key>using_lng</key>
+  <value>Using language: </value>
+</translation>
+
+<translation>
+  <key>upass_incorrect</key>
+  <value>Username or password is incorrect</value>
+</translation>
+
+<translation>
+  <key>login_prompt</key>
+  <value>Please log into the database.</value>
+</translation>
+
+<translation>
+  <key>uname_prompt</key>
+  <value>Username:</value>
+</translation>
+
+<translation>
+  <key>pword_prompt</key>
+  <value>Password:</value>
+</translation>
+
+<!-- button text -->
+<translation>
+  <key>login</key>
+  <value>Login</value>
+</translation>
+
+<translation>
+  <key>submit</key>
+  <value>Submit</value>
+</translation>
+
+<translation>
+  <key>exit</key>
+  <value>Exit</value>
+</translation>
+
+<translation>
+  <key>add_loc</key>
+  <value>Add Location</value>
+</translation>
+
+<!-- error prompts -->
+<translation>
+  <key>db_err</key>
+  <value>Error interfacing with database</value>
+</translation>
+
+<translation>
+  <key>uncaught_exc</key>
+  <value>Uncaught Exception: </value>
+</translation>
+
+<translation>
+  <key>create_person_err</key>
+  <value>Error creating person: </value>
+</translation>
+
+<translation>
+  <key>create_location_err</key>
+  <value>Error creating location: </value>
+</translation>
+
+<translation>
+  <key>try_again</key>
+  <value>Please try again.</value>
+</translation>
+
+<translation>
+  <key>person_created</key>
+  <value>Disaster victim added successfully</value>
+</translation>
+
+<translation>
+  <key>exit_success</key>
+  <value>Thank you for using Relief Service</value>
+</translation>
+
+<translation>
+  <key>inv_date</key>
+  <value>Invalid Date Format: </value>
+</translation>
+
+<translation>
+  <key>inv_gender</key>
+  <value>Invalid Gender: </value>
+</translation>
+
+<translation>
+  <key>inv_quantity</key>
+  <value>Invalid Quantity: </value>
+</translation>
+
+<!-- input options and examples -->
+<translation>
+  <key>male</key>
+  <value>Male</value>
+</translation>
+
+<translation>
+  <key>female</key>
+  <value>Female</value>
+</translation>
+
+<translation>
+  <key>non_binary</key>
+  <value>Non-Binary Person</value>
+</translation>
+
+<translation>
+  <key>ex_date</key>
+  <value>YYYY-MM-DD</value>
+</translation>
+
+<translation>
+  <key>new_location</key>
+  <value>Add New Location</value>
+</translation>
+
+<translation>
+  <key>water</key>
+  <value>Water</value>
+</translation>
+
+<translation>
+  <key>blanket</key>
+  <value>Blanket</value>
+</translation>
+
+<translation>
+  <key>cot</key>
+  <value>Cot</value>
+</translation>
+
+<translation>
+  <key>belonging</key>
+  <value>Personal Belonging</value>
+</translation>
+
+<translation>
+  <key>quantity</key>
+  <value>Quantity: </value>
+</translation>
+
+<translation>
+  <key>comments</key>
+  <value>Comments: </value>
+</translation>
+
+<translation>
+  <key>room</key>
+  <value>Room: </value>
+</translation>
+
+<translation>
+  <key>grid</key>
+  <value>Grid Position: </value>
+</translation>
+
+<translation>
+  <key>desc</key>
+  <value>Description: </value>
+</translation>
+
+<!-- menu prompts -->
+<translation>
+  <key>data_view</key>
+  <value>View Data</value>
+</translation>
+
+<translation>
+  <key>data_update</key>
+  <value>Update Data</value>
+</translation>
+
+<translation>
+  <key>data_entry</key>
+  <value>Enter Data</value>
+</translation>
+
+<translation>
+  <key>victim</key>
+  <value>Disaster Victim</value>
+</translation>
+
+<translation>
+  <key>inquiry</key>
+  <value>Inquiry</value>
+</translation>
+
+<translation>
+  <key>supply</key>
+  <value>Supply</value>
+</translation>
+
+<translation>
+  <key>create_victim</key>
+  <value>Disaster Victim</value>
+</translation>
+
+<translation>
+  <key>water</key>
+  <value>Water</value>
+</translation>
+
+<translation>
+  <key>blanket</key>
+  <value>Blanket</value>
+</translation>
+
+<translation>
+  <key>cot</key>
+  <value>Cot</value>
+</translation>
+
+<translation>
+  <key>belonging</key>
+  <value>Personal Belonging</value>
+</translation>
+
+<!-- non dropwodn menu options -->
+<translation>
+  <key>choose_action</key>
+  <value>Choose an action from the dropdown menu: </value>
+</translation>
+
+<translation>
+  <key>choose_type</key>
+  <value>What do you want to add to: </value>
+</translation>
+
+<translation>
+  <key>fname</key>
+  <value>First Name: </value>
+</translation>
+
+<translation>
+  <key>lname</key>
+  <value>Last Name: </value>
+</translation>
+
+<translation>
+  <key>dob</key>
+  <value>Date of Birth: </value>
+</translation>
+
+<translation>
+  <key>gender</key>
+  <value>Gender: </value>
+</translation>
+
+<translation>
+  <key>phone</key>
+  <value>Phone Number: </value>
+</translation>
+
+<translation>
+  <key>entry_date</key>
+  <value>Entry-Date: </value>
+</translation>
+
+<translation>
+  <key>location</key>
+  <value>Current Location:</value>
+</translation>
+
+<translation>
+  <key>loc_name</key>
+  <value>Location name: </value>
+</translation>
+
+<translation>
+  <key>loc_adr</key>
+  <value>Location address: </value>
+</translation>
+
+<translation>
+  <key>type_prompt</key>
+  <value>Choose a type: </value>
+</translation>
