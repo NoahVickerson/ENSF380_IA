@@ -2,13 +2,14 @@ package edu.ucalgary.oop;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.Array;
 
 import javax.swing.*;
 import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.ArrayList;
 
-public class UserInterface extends JFrame{
+public class UserInterface extends JFrame {
     private ReliefController controller;
     private ErrorLogger logger;
     private TextInputValidator validator;
@@ -19,7 +20,7 @@ public class UserInterface extends JFrame{
     public UserInterface(ErrorLogger logger, TextInputValidator validator) {
         super("Relief Services System");
 
-        setSize(500,800);
+        setSize(850,800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         this.logger = logger;
@@ -36,6 +37,7 @@ public class UserInterface extends JFrame{
             try {
                 controller = ReliefController.getInstance(uname, pword);
             }catch (IllegalArgumentException e) {
+                e.printStackTrace();
                 displayError(validator.translateToLanguage("upass_incorrect") + "\n" + e.getMessage());
                 loggedIn = false;
                 continue;
@@ -117,6 +119,9 @@ public class UserInterface extends JFrame{
     }
 
     public void mainMenu() {
+        this.setLayout(new FlowLayout());
+
+        JScrollPane scrollPane = new JScrollPane();
 
         String[] menuItems = {validator.translateToLanguage("data_view"), validator.translateToLanguage("data_update"), validator.translateToLanguage("data_entry")};
 
@@ -142,10 +147,18 @@ public class UserInterface extends JFrame{
                 exit(validator.translateToLanguage("exit_success"), 0);
             }
         });
+
+        JButton saveButton = new JButton(validator.translateToLanguage("refresh"));
+
+        exitPanel.add(saveButton);
         exitPanel.add(exitButton);
 
+        scrollPane.setViewportView(contentPanel);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setPreferredSize(new Dimension(850, 675));
         this.add(comboBoxPanel, BorderLayout.NORTH);
-        this.add(contentPanel, BorderLayout.CENTER);
+        this.add(scrollPane, BorderLayout.CENTER);
+        this.add(exitPanel, BorderLayout.SOUTH);
         this.setVisible(true);
 
         menuDropdown.addItemListener(new ItemListener() {
@@ -153,6 +166,15 @@ public class UserInterface extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 CardLayout cl = (CardLayout) contentPanel.getLayout();
                 cl.show(contentPanel, (String) e.getItem());
+            }
+        });
+
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //removeAll();
+                repaint();
+                revalidate();
             }
         });
 
@@ -192,25 +214,153 @@ public class UserInterface extends JFrame{
 
     public JPanel dataUpdateMenu() {
         JPanel updatePanel = new JPanel();
+        updatePanel.setLayout(new BoxLayout(updatePanel, BoxLayout.Y_AXIS));
 
-        updatePanel.add(new JLabel("Update"));
+        String[] menuItems = {validator.translateToLanguage("victim"), validator.translateToLanguage("inquiry"), validator.translateToLanguage("location")};
+
+        JLabel menuLabel = new JLabel(validator.translateToLanguage("choose_update"));
+        JComboBox menuDropdown = new JComboBox(menuItems);
+
+        JPanel updateContent = new JPanel(new CardLayout());
+
+        updateContent.add(updatePerson(), menuItems[0]);
+        updateContent.add(updateInquiry(), menuItems[1]);
+        updateContent.add(updateLocation(), menuItems[2]);
+
+        menuDropdown.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                CardLayout cl = (CardLayout) updateContent.getLayout();
+                cl.show(updateContent, (String) e.getItem());
+            }
+        });
+
+        updatePanel.add(menuLabel);
+        updatePanel.add(menuDropdown);
+        updatePanel.add(updateContent);
 
         return updatePanel;
     }
 
     public JPanel dataViewMenu() {
         JPanel viewPanel = new JPanel();
+        viewPanel.setLayout(new FlowLayout());
 
-        viewPanel.add(new JLabel("View"));
+        viewPanel.add(new JLabel(validator.translateToLanguage("view")));
+
+        String[] menuItems = {validator.translateToLanguage("victim"), validator.translateToLanguage("inquiry"), validator.translateToLanguage("location")};
+
+        JComboBox menuDropdown = new JComboBox(menuItems);
+        menuDropdown.setEditable(false);
+        
+        viewPanel.add(menuDropdown);
+
+        JPanel form = new JPanel(new CardLayout());
+
+        form.add(viewPerson(), menuItems[0]);
+        form.add(viewInquiry(), menuItems[1]);
+        form.add(viewLocation(), menuItems[2]);
+
+        menuDropdown.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                CardLayout cl = (CardLayout) form.getLayout();
+                cl.show(form, (String) e.getItem());
+            }
+        });
+
+        viewPanel.add(form);
 
         return viewPanel;
     }
 
     public JPanel createInquiry() {
         JPanel inquiryPanel = new JPanel();
+        inquiryPanel.setLayout(new BoxLayout(inquiryPanel, BoxLayout.Y_AXIS));
 
         JLabel createInquiry = new JLabel("Create Inquiry");
         inquiryPanel.add(createInquiry);
+
+        JLabel inq_prompt = new JLabel(validator.translateToLanguage("inquirer"));
+        Person[] inquirerPeople = controller.getPeople();
+        String[] inquirers = new String[inquirerPeople.length];
+        ArrayList<String> inquirersList = new ArrayList<String>();
+
+        int num_victims = 0;
+
+        for (int i = 0; i < inquirerPeople.length; i++) {
+            inquirers[i] = (inquirerPeople[i].getFirstName() + " " + inquirerPeople[i].getLastName());
+            inquirersList.add(inquirerPeople[i].getFirstName() + " " + inquirerPeople[i].getLastName());
+        }
+        JComboBox inquirerInput = new JComboBox(inquirers);
+
+        JLabel victim_prompt = new JLabel(validator.translateToLanguage("victim") + ": ");
+        DisasterVictim[] victims = controller.getVictims();
+        String[] victimsNames = new String[victims.length];
+        ArrayList<String> victimsNamesList = new ArrayList<String>();
+
+        for (int i = 0; i < victims.length; i++) {
+            victimsNames[i] = (victims[i].getFirstName() + " " + victims[i].getLastName());
+            victimsNamesList.add(victims[i].getFirstName() + " " + victims[i].getLastName());
+        }
+        JComboBox victimInput = new JComboBox(victimsNames);
+
+        inquiryPanel.add(inq_prompt);
+        inquiryPanel.add(inquirerInput);
+        inquiryPanel.add(victim_prompt);
+        inquiryPanel.add(victimInput);
+        
+        JLabel doi = new JLabel(validator.translateToLanguage("doi"));
+        JTextField doiInput = new JTextField(validator.translateToLanguage("ex_date"), 15);
+
+        inquiryPanel.add(doi);
+        inquiryPanel.add(doiInput);
+
+        JLabel infoProvided = new JLabel(validator.translateToLanguage("comments"));
+        JTextField infoProvidedInput = new JTextField(15);
+
+        inquiryPanel.add(infoProvided);
+        inquiryPanel.add(infoProvidedInput);
+
+        Location[] locations = controller.getLocations();
+        String[] locationNames = new String[locations.length];
+        ArrayList<String> locationNamesList = new ArrayList<String>();
+
+        for (int i = 0; i < locations.length; i++) {
+            locationNames[i] = locations[i].getName();
+            locationNamesList.add(locations[i].getName());
+        }
+
+        JLabel location_prompt = new JLabel(validator.translateToLanguage("location"));
+        JComboBox locationInput = new JComboBox(locationNames);
+
+        inquiryPanel.add(location_prompt);
+        inquiryPanel.add(locationInput);
+
+        JButton submit = new JButton(validator.translateToLanguage("submit"));
+        submit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Person inquirer = controller.fetchPerson(inquirerInput.getSelectedItem().toString().split(" ")[0], inquirerInput.getSelectedItem().toString().split(" ")[1]);
+                DisasterVictim victim = controller.fetchVictim(victimInput.getSelectedItem().toString().split(" ")[0], victimInput.getSelectedItem().toString().split(" ")[1]);
+                String dateOfInquiry = doiInput.getText();
+                String comments = infoProvidedInput.getText();
+                Location location = controller.fetchLocation(locationInput.getSelectedItem().toString());
+
+                try{
+                    controller.addInquiry(inquirer, victim, dateOfInquiry, comments, location);
+                    controller.fetchInquiry(inquirer, victim, dateOfInquiry).addEntry();
+                    displayError(validator.translateToLanguage("create_inquiry_success"));
+                } catch (IllegalArgumentException e1) {
+                    displayError(validator.translateToLanguage("create_inquiry_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                } catch (SQLException e1) {
+                    logger.logError(e1);
+                    exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
+                }
+            }
+        });
+
+        inquiryPanel.add(submit);
 
         return inquiryPanel;
     }
@@ -237,7 +387,7 @@ public class UserInterface extends JFrame{
         JLabel entryDate = new JLabel(validator.translateToLanguage("entry_date"));
         JTextField entryDateInput = new JTextField(validator.translateToLanguage("ex_date"), 15);
 
-        JLabel currentLocation = new JLabel(validator.translateToLanguage("location"));
+        JLabel currentLocation = new JLabel(validator.translateToLanguage("location") + ": ");
         JPanel locationPanel = new JPanel(new CardLayout());
         StringBuilder newLocationName = new StringBuilder();
         StringBuilder newLocationAddress = new StringBuilder();
@@ -315,6 +465,7 @@ public class UserInterface extends JFrame{
                             }
                             controller.addLocation(location);
                             location.addEntry();
+                            displayError(validator.translateToLanguage("create_location_success"));
                         }
                     }else{
                         location = locations[locationNames.indexOf(currentLocation)];
@@ -369,7 +520,7 @@ public class UserInterface extends JFrame{
     public JPanel createMedicalRecord() {
         JPanel medicalRecordPanel = new JPanel();
 
-        JLabel createMedicalRecord = new JLabel(validator.translateToLanguage("create_record"));
+        JLabel createMedicalRecord = new JLabel(validator.translateToLanguage("add_record"));
         medicalRecordPanel.add(createMedicalRecord);
 
         return medicalRecordPanel;
@@ -385,7 +536,7 @@ public class UserInterface extends JFrame{
         supplyPanel.setLayout(new BoxLayout(supplyPanel, BoxLayout.Y_AXIS));
 
         JLabel type = new JLabel(validator.translateToLanguage("type_prompt"));
-        String[] types = {validator.translateToLanguage("water"), validator.translateToLanguage("blanket"), validator.translateToLanguage("cot"), validator.translateToLanguage("belonging")};
+        String[] types = {validator.translateToLanguage("water"), validator.translateToLanguage("blanket"), validator.translateToLanguage("cot"), validator.translateToLanguage("personal_belonging")};
 
         JComboBox typeInput = new JComboBox(types);
         supplyPanel.add(type);
@@ -518,16 +669,61 @@ public class UserInterface extends JFrame{
                             supplyHolderLocation.updateEntry();
                         }
                     } else if (type.equals(types[1])) {
-                        //quantity = quantityInputBlanket.getText();
+                        if(!validator.isValidQuantity(quantityInputWater.getText())) {
+                            throw new IllegalArgumentException("inv_quantity");
+                        }
+                        quantity = Integer.parseInt(quantityInputBlanket.getText());
                         comments = commentsInputBlanket.getText();
+
+                        Supply blanket = new Supply("blanket", quantity);
+
+                        blanket.setComments(comments);
+
+                        if(supplyHolderPerson != null) {
+                            supplyHolderPerson.addSupply(blanket);
+                            supplyHolderPerson.updateEntry();
+                        } else {
+                            supplyHolderLocation.addSupply(blanket);
+                            supplyHolderLocation.updateEntry();
+                        }
                     } else if (type.equals(types[2])) {
                         comments = commentsInputCot.getText();
+                        String room = roomInput.getText();
+                        String grid = gridInput.getText();
+
+                        if(!validator.isValidRoom(room) || !validator.isValidGrid(grid)) {
+                            throw new IllegalArgumentException("inv_room_grid");
+                        }
+
+                        Cot cot = new Cot(room, grid, comments);
+
+                        if(supplyHolderPerson != null) {
+                            supplyHolderPerson.addSupply(cot);
+                            supplyHolderPerson.updateEntry();
+                        } else {
+                            supplyHolderLocation.addSupply(cot);
+                            supplyHolderLocation.updateEntry();
+                        }
                     } else if (type.equals(types[3])) {
-                        //quantity = quantityInput.getText();
+                        if(!validator.isValidQuantity(quantityInput.getText())) {
+                            throw new IllegalArgumentException("inv_quantity");
+                        }
+                        quantity = Integer.parseInt(quantityInput.getText());
                         comments = commentsInput.getText();
+                        String desc = descInput.getText();
+
+                        PersonalBelonging belonging = new PersonalBelonging(desc, comments, quantity);
+
+                        if(supplyHolderPerson != null) {
+                            supplyHolderPerson.addSupply(belonging);
+                            supplyHolderPerson.updateEntry();
+                        } else {
+                            throw new IllegalArgumentException("pb_only_person");
+                        }
                     }
+                    displayError(validator.translateToLanguage("create_supply_success"));
                 }catch (IllegalArgumentException e1) {
-                    displayError(validator.translateToLanguage("create_person_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                    displayError(validator.translateToLanguage("create_supply_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
                 } catch (SQLException e1) {
                     logger.logError(e1);
                     exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
@@ -538,13 +734,416 @@ public class UserInterface extends JFrame{
         return supplyPanel;
     }
 
-    public void updatePerson() {
+    public JPanel updatePerson() {
+        JPanel personPanel = new JPanel();
+        personPanel.setLayout(new BoxLayout(personPanel, BoxLayout.Y_AXIS));
+
+        DisasterVictim[] people = controller.getVictims();
+        String[] peopleNames = new String[people.length];
+        ArrayList<String> peopleList = new ArrayList<String>();
+        
+        for (int i = 0; i < people.length; i++) {
+            peopleNames[i] = people[i].getFirstName() + " " + people[i].getLastName();
+            peopleList.add(peopleNames[i]);
+        }
+
+        JComboBox personInput = new JComboBox(peopleNames);
+        JPanel personContent = new JPanel(new CardLayout());
+
+        personPanel.add(personInput);
+        personPanel.add(personContent);
+
+        for (int i = 0; i < people.length; i++) {
+            personContent.add(people[i].getFirstName() + " " + people[i].getLastName(), updateIndividualPerson(people[i]));
+        }
+
+        personInput.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CardLayout cl = (CardLayout) personContent.getLayout();
+                cl.show(personContent, (String) personInput.getSelectedItem());
+            }   
+        });
+
+        return personPanel;
     }
 
-    public void updateInquiry() {
+    public JPanel updateIndividualPerson(DisasterVictim person) {
+        JPanel personPanel = new JPanel();
+        personPanel.setLayout(new BoxLayout(personPanel, BoxLayout.Y_AXIS));
+
+        JLabel firstName = new JLabel(validator.translateToLanguage("fname"));
+        JTextField firstNameInput = new JTextField(person.getFirstName(), 15);
+        JLabel lastName = new JLabel(validator.translateToLanguage("lname"));
+        JTextField lastNameInput = new JTextField(person.getLastName(), 15);
+        JLabel dateOfBirth = new JLabel(validator.translateToLanguage("dob"));
+        JTextField dateOfBirthInput = new JTextField(person.getDateOfBirth(), 15);
+        JLabel gender = new JLabel(validator.translateToLanguage("gender"));
+
+        String[] genderOptions = {validator.translateToLanguage("male"), validator.translateToLanguage("female"), validator.translateToLanguage("non_binary")};
+        JComboBox genderInput = new JComboBox(genderOptions);
+        if(person.getGender() != null) {
+            genderInput.setSelectedItem(validator.translateToLanguage(person.getGender()));
+        }
+        JLabel phoneNum = new JLabel(validator.translateToLanguage("phone"));
+        JTextField phoneNumInput = new JTextField(person.getPhoneNumber(), 15);
+
+        personPanel.add(firstName);
+        personPanel.add(firstNameInput);
+        personPanel.add(lastName);
+        personPanel.add(lastNameInput);
+        personPanel.add(dateOfBirth);
+        personPanel.add(dateOfBirthInput);
+        personPanel.add(gender);
+        personPanel.add(genderInput);
+        personPanel.add(phoneNum);
+        personPanel.add(phoneNumInput);
+
+        // allow adding family members
+        personPanel.add(new JLabel(validator.translateToLanguage("add_family")));
+
+        Person[] possibleFamily = controller.getPeople();
+        String[] familyNames = new String[possibleFamily.length];
+
+        for (int i = 0; i < possibleFamily.length; i++) {
+            familyNames[i] = possibleFamily[i].getFirstName() + " " + possibleFamily[i].getLastName();
+        }
+
+        JComboBox familyInput = new JComboBox(familyNames);
+        personPanel.add(familyInput);
+
+        JButton addFamily = new JButton(validator.translateToLanguage("add_family"));
+        personPanel.add(addFamily);
+
+        addFamily.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    person.addFamilyMember(possibleFamily[familyInput.getSelectedIndex()]);
+                    possibleFamily[familyInput.getSelectedIndex()].updateEntry();
+                    displayError(validator.translateToLanguage("add_family_success"));
+                } catch (IllegalArgumentException e1) {
+                    e1.printStackTrace();
+                    displayError(validator.translateToLanguage("add_family_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                } catch (SQLException e1) {
+                    logger.logError(e1);
+                    exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
+                }
+            }
+        });
+
+        // allow moving locations
+        personPanel.add(new JLabel(validator.translateToLanguage("move_location")));
+        Location[] locations = controller.getLocations();
+        String[] locationNames = new String[locations.length];
+
+        for (int i = 0; i < locations.length; i++) {
+            locationNames[i] = locations[i].getName();
+        }
+
+        JComboBox locationInput = new JComboBox(locationNames);
+        if(person.getCurrentLocation() != null) {
+            locationInput.setSelectedItem(person.getCurrentLocation().getName());
+        }
+        personPanel.add(locationInput);
+
+        // allow adding medical records
+        personPanel.add(new JLabel(validator.translateToLanguage("medical")));
+
+        if(person.getMedicalRecords() != null) {
+            JPanel medicalPanel = new JPanel(new CardLayout());
+            medicalPanel.setLayout(new BoxLayout(medicalPanel, BoxLayout.Y_AXIS));
+
+            MedicalRecord[] medicalRecords = person.getMedicalRecords();
+            String[] medicalRecordNames = new String[medicalRecords.length + 2];
+            ArrayList<String> medicalRecordNamesList = new ArrayList<String>();
+
+            for (int i = 0; i < medicalRecords.length; i++) {
+                medicalRecordNamesList.add(medicalRecords[i].getDateOfTreatment());
+                medicalRecordNames[i] = medicalRecords[i].getDateOfTreatment();
+            }
+
+            medicalRecordNames[medicalRecords.length] = validator.translateToLanguage("add_record");
+
+            JComboBox medicalInput = new JComboBox(medicalRecordNames);
+
+            JPanel[] medicalRecordPanels = new JPanel[medicalRecords.length + 1];
+
+            for (int i = 0; i < medicalRecords.length; i++) {
+                medicalRecordPanels[i] = updateMedicalRecord(medicalRecords[i]);
+            }
+
+            medicalRecordPanels[medicalRecords.length] = createMedicalRecord();
+
+            personPanel.add(medicalInput);
+            personPanel.add(medicalPanel);
+        }else{
+            personPanel.add(createMedicalRecord());
+        }
+
+
+        // allow adding supplies
+        personPanel.add(new JLabel(validator.translateToLanguage("add_supply")));
+
+        JButton updatePerson = new JButton(validator.translateToLanguage("update"));
+
+        updatePerson.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    person.setFirstName(firstNameInput.getText());
+                    person.setLastName(lastNameInput.getText());
+                    person.setDateOfBirth(dateOfBirthInput.getText());
+                    person.setGender(validator.translateToKey((String) genderInput.getSelectedItem()));
+                    person.setPhoneNumber(phoneNumInput.getText());
+                    person.setCurrentLocation(controller.fetchLocation(locationInput.getSelectedItem().toString()));
+
+                    person.updateEntry();
+                    displayError(validator.translateToLanguage("update_person_success"));
+                } catch (IllegalArgumentException e1) {
+                    displayError(validator.translateToLanguage("update_person_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                } catch (SQLException e1) {
+                    logger.logError(e1);
+                    exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
+                }
+            }
+        });
+        personPanel.add(updatePerson);
+
+        return personPanel;
     }
 
-    public void updateLocation() {
+    public JPanel updateInquiry() {
+        JPanel inquiryPanel = new JPanel();
+        inquiryPanel.setLayout(new BoxLayout(inquiryPanel, BoxLayout.Y_AXIS));
+
+        inquiryPanel.add(new JLabel(validator.translateToLanguage("update_inquiry")));
+
+        return inquiryPanel;
+    }
+
+    public JPanel updateMedicalRecord(MedicalRecord medicalRecord) {
+        JPanel medicalPanel = new JPanel();
+        medicalPanel.setLayout(new BoxLayout(medicalPanel, BoxLayout.Y_AXIS));
+
+        JLabel dateOfTreatment = new JLabel(validator.translateToLanguage("date_of_treatment"));
+        JTextField dateOfTreatmentInput = new JTextField(medicalRecord.getDateOfTreatment(), 15);
+
+        medicalPanel.add(dateOfTreatment);
+        medicalPanel.add(dateOfTreatmentInput);
+
+        return medicalPanel;
+    }
+
+    public JPanel updateLocation() {
+        JPanel locationPanel = new JPanel();
+        locationPanel.setLayout(new BoxLayout(locationPanel, BoxLayout.Y_AXIS));
+
+        Location[] locations = controller.getLocations();
+        String[] locationNames = new String[locations.length];
+        ArrayList<String> locationList = new ArrayList<String>();
+
+        for (int i = 0; i < locations.length; i++) {
+            locationNames[i] = locations[i].getName();
+            locationList.add(locationNames[i]);
+        }
+
+        JComboBox locationInput = new JComboBox(locationNames);
+
+        locationPanel.add(locationInput);
+
+        return locationPanel;
+    }
+
+    public JPanel viewPerson() {
+        JPanel personPanel = new JPanel();
+        personPanel.setLayout(new BoxLayout(personPanel, BoxLayout.Y_AXIS));
+
+        Person[] people = controller.getPeople();
+        String[] peopleNames = new String[people.length];
+        int numVictims = 0;
+
+        for (int i = 0; i < people.length; i++) {
+            if(people[i] instanceof DisasterVictim) {
+                peopleNames[i] = people[i].getFirstName() + " " + people[i].getLastName();
+                numVictims++;
+            }
+        }
+
+        String[] namesTruncated = new String[numVictims];
+
+        for(int i = 0; i < numVictims; i++) {
+            if(peopleNames[i] != null) {
+                namesTruncated[i] = peopleNames[i];
+            }
+        }
+
+        JComboBox personInput = new JComboBox(namesTruncated);
+        JPanel personContent = new JPanel(new CardLayout());
+
+        JPanel[] personPanels = new JPanel[people.length];
+
+        for(int i = 0; i < people.length; i++) {
+            if(people[i] instanceof DisasterVictim) {
+                personPanels[i] = new JPanel();
+                personPanels[i].setLayout(new BoxLayout(personPanels[i], BoxLayout.Y_AXIS));
+                DisasterVictim person = (DisasterVictim) people[i];
+                peopleNames[i] = person.getFirstName() + " " + person.getLastName();
+                personPanels[i].add(new JLabel(validator.translateToLanguage("id") + person.getId()));
+                personPanels[i].add(new JLabel(validator.translateToLanguage("name") + person.getFirstName() + " " + person.getLastName()));
+
+                if(person.getGender() != null){
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("gender") + validator.translateToLanguage(person.getGender())));
+                }
+                if(person.getDateOfBirth() != null){
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("dob") + person.getDateOfBirth()));
+                }
+                if(person.getPhoneNumber() != null){
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("phone") + person.getPhoneNumber()));
+                }
+                if(person.getEntryDate() != null){
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("entry") + person.getEntryDate()));
+                }
+                if(person.getFamilyGroup() != null){
+                    FamilyGroup familyGroup = person.getFamilyGroup();
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("hr")));
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("family_group")));
+                    for(Person familyMember : familyGroup.getFamilyMembers()){
+                        personPanels[i].add(new JLabel("- " + familyMember.getFirstName() + " " + familyMember.getLastName()));
+                    }
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("hr")));
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("hr")));
+                }
+
+                personPanels[i].add(new JLabel("\n\n" + validator.translateToLanguage("pb")));
+
+                if(person.getPersonalBelongings() != null){
+                    Supply[] supplies = person.getPersonalBelongings();
+                for(int j = 0; j < supplies.length; j++){
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("hr")));
+                    if(supplies[j] instanceof Cot){
+                        Cot cot = (Cot) supplies[j];
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("cot")));
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("room") + cot.getRoom()));
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("grid") + cot.getGrid()));
+                    }else if(supplies[j] instanceof Water){
+                        Water water = (Water) supplies[j];
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("water")));
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("quantity") + water.getQuantity()));
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("comments") + water.getComments()));
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("alloc_date") + water.getAllocationDate()));
+                    }else if(supplies[j] instanceof PersonalBelonging){
+                        PersonalBelonging pb = (PersonalBelonging) supplies[j];
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("quantity") + pb.getQuantity()));
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("comments") + pb.getComments()));
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("desc") + pb.getDescription()));
+                    }else{
+                        personPanels[i].add(new JLabel(validator.translateToLanguage(supplies[j].getType())));
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("comments") + supplies[j].getComments()));
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("quantity") + supplies[j].getQuantity()));
+                    }
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("id") + supplies[j].getId()));
+                }
+                }
+                
+
+                if(person.getCurrentLocation() != null){
+                    Location location = person.getCurrentLocation();
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("hr")));
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("location")));
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("hr")));
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("name") + location.getName()));
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("address") + location.getAddress()));
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("id") + location.getId()));
+                }
+                personContent.add(peopleNames[i], personPanels[i]);
+            }
+        }
+
+        personPanel.add(personInput);
+        personPanel.add(personContent);
+
+        personInput.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                CardLayout cl = (CardLayout) personContent.getLayout();
+                cl.show(personContent, (String) e.getItem());
+            }
+        });
+
+        return personPanel;
+    }
+
+    public JPanel viewInquiry() {
+        JPanel inquiryPanel = new JPanel();
+        inquiryPanel.setLayout(new BoxLayout(inquiryPanel, BoxLayout.Y_AXIS));
+
+        Inquiry[] inquiries = controller.getInquiries();
+
+        for(int i = 0; i < inquiries.length; i++) {
+
+            inquiryPanel.add(new JLabel(validator.translateToLanguage("id") + inquiries[i].getId()));
+            inquiryPanel.add(new JLabel(validator.translateToLanguage("inquirer") + inquiries[i].getInquirer().getFirstName() + " " + inquiries[i].getInquirer().getLastName()));
+            inquiryPanel.add(new JLabel(validator.translateToLanguage("victim") + ": " + inquiries[i].getMissingPerson().getFirstName() + " " + inquiries[i].getMissingPerson().getLastName()));
+            inquiryPanel.add(new JLabel(validator.translateToLanguage("doi") + inquiries[i].getDateOfInquiry()));
+            inquiryPanel.add(new JLabel(validator.translateToLanguage("comments") + inquiries[i].getInfoProvided()));
+            inquiryPanel.add(new JLabel(validator.translateToLanguage("last_loc") + inquiries[i].getLastKnownLocation().getName()));
+            inquiryPanel.add(new JLabel(validator.translateToLanguage("hr") + "\n\n"));
+        }
+
+
+
+        return inquiryPanel;
+    }
+
+    public JPanel viewLocation() {
+        JPanel locationPanel = new JPanel();
+        locationPanel.setLayout(new BoxLayout(locationPanel, BoxLayout.Y_AXIS));
+
+        Location[] locations = controller.getLocations();
+
+        for(int i = 0; i < locations.length; i++) {
+
+            locationPanel.add(new JLabel(validator.translateToLanguage("id") + locations[i].getId()));
+            locationPanel.add(new JLabel(validator.translateToLanguage("name") + locations[i].getName()));
+            locationPanel.add(new JLabel(validator.translateToLanguage("address") + locations[i].getAddress()));
+
+            locationPanel.add(new JLabel(validator.translateToLanguage("supplies")));
+            if(locations[i].getSupplies() != null){
+                Supply[] supplies = locations[i].getSupplies();
+                for(int j = 0; j < supplies.length; j++){
+                    locationPanel.add(new JLabel(validator.translateToLanguage("hr")));
+                    if(supplies[j] instanceof Cot){
+                        Cot cot = (Cot) supplies[j];
+                        locationPanel.add(new JLabel(validator.translateToLanguage("cot")));
+                        locationPanel.add(new JLabel(validator.translateToLanguage("room") + cot.getRoom()));
+                        locationPanel.add(new JLabel(validator.translateToLanguage("grid") + cot.getGrid()));
+                    }else if(supplies[j] instanceof Water){
+                        Water water = (Water) supplies[j];
+                        locationPanel.add(new JLabel(validator.translateToLanguage("water")));
+                        locationPanel.add(new JLabel(validator.translateToLanguage("quantity") + water.getQuantity()));
+                        locationPanel.add(new JLabel(validator.translateToLanguage("comments") + water.getComments()));
+                        locationPanel.add(new JLabel(validator.translateToLanguage("alloc_date") + water.getAllocationDate()));
+                    }else if(supplies[j] instanceof PersonalBelonging){
+                        PersonalBelonging pb = (PersonalBelonging) supplies[j];
+                        locationPanel.add(new JLabel(validator.translateToLanguage("quantity") + pb.getQuantity()));
+                        locationPanel.add(new JLabel(validator.translateToLanguage("comments") + pb.getComments()));
+                        locationPanel.add(new JLabel(validator.translateToLanguage("desc") + pb.getDescription()));
+                    }else{
+                        locationPanel.add(new JLabel(validator.translateToLanguage(supplies[j].getType())));
+                        locationPanel.add(new JLabel(validator.translateToLanguage("comments") + supplies[j].getComments()));
+                        locationPanel.add(new JLabel(validator.translateToLanguage("quantity") + supplies[j].getQuantity()));
+                    }
+                    locationPanel.add(new JLabel(validator.translateToLanguage("id") + supplies[j].getId()));
+                }
+            }
+            locationPanel.add(new JLabel(validator.translateToLanguage("hr") + "\n\n"));
+            locationPanel.add(new JLabel(validator.translateToLanguage("hr") + "\n\n"));
+        }
+
+        
+
+        return locationPanel;
     }
 
     public void exit(String message, int exitCode) {

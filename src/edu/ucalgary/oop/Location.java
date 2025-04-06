@@ -17,6 +17,18 @@ public class Location implements DatabaseInterfaceable{
 		this.id = counter++;
 	}
 
+	public Location(int id, String name, String address) throws IllegalArgumentException {
+		if(id < counter){
+			throw new IllegalArgumentException("id may not be unique");
+		}
+		this.name = name;
+		this.address = address;
+		this.id = id;
+		if(counter < id){
+			counter = id;
+		}
+	}
+
 	public int getId(){
 		return this.id;
 	}
@@ -148,6 +160,14 @@ public class Location implements DatabaseInterfaceable{
 		String[] types = {"string", "string", "int"};
 		DbConnector db = DbConnector.getInstance();
 		db.deadEndQuery(query, values, types);
+
+		for(Supply s : this.supplies) {
+            s.updateEntry();
+            query = "INSERT INTO SupplyAllocation (supply_id, person_id, location_id) VALUES (?, ?, ?)";
+            String[] newValues = {String.valueOf(s.getId()), "null", String.valueOf(id)};
+            String[] newTypes = {"int", "int", "int"};
+            db.deadEndQuery(query, newValues, newTypes);
+        }
 	}
 
 }

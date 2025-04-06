@@ -8,28 +8,48 @@ import java.util.regex.*;
 public class TextInputValidator {
     private ArrayList<String> keys;
     private ArrayList<String> translations;
+    private static TextInputValidator instance = null;
 
     public TextInputValidator(String languageFilePath) throws IllegalArgumentException {
+        if (instance != null) {
+            throw new IllegalArgumentException("TextInputValidator has already been initialized");
+        }
+
         keys = new ArrayList<>();
         translations = new ArrayList<>();
         
         try {
             readLanguageFile(languageFilePath);
+            instance = this;
         }
         catch (Exception e) {
             throw new IllegalArgumentException(e.getMessage());
         }
     }
 
+    public static TextInputValidator getInstance() throws IllegalArgumentException {
+        if (instance == null) {
+            throw new IllegalArgumentException("TextInputValidator has not been initialized");
+        }
+        return instance;
+    }
+
     public String translateToKey(String translation) {
         if(translations.contains(translation)){
             return keys.get(translations.indexOf(translation));
-        }else{
+        }else if (translations.contains(translation.toLowerCase())) {
+            return keys.get(translations.indexOf(translation.toLowerCase()));
+        }
+        else{
             return null;
         }
     }
 
     public String translateToLanguage(String key) {
+        if(key == null){
+            return null;
+        }
+        key = key.replaceAll(" ", "_");
         if(keys.contains(key)){
             return translations.get(keys.indexOf(key));
         }else{
@@ -62,7 +82,7 @@ public class TextInputValidator {
             return true;
         }
 
-        return phoneNum.matches("^[0-9]{3}-[0-9]{3}-[0-9]{4}$") || phoneNum.equalsIgnoreCase("null");
+        return phoneNum.matches("^[0-9]{3}-[0-9]{3}-[0-9]{4}$") || phoneNum.equalsIgnoreCase("null") || phoneNum.matches("^[0-9]{3}-[0-9]{4}$");
     }
 
     
@@ -75,6 +95,12 @@ public class TextInputValidator {
 
     public static boolean isValidGrid(String grid) {
         Pattern pattern = Pattern.compile("^[A-Za-z]\\d+$");
+        Matcher matcher = pattern.matcher(grid);
+        return matcher.matches();
+    }
+
+    public static boolean isValidRoom(String grid) {
+        Pattern pattern = Pattern.compile("^[A-Za-z]*$");
         Matcher matcher = pattern.matcher(grid);
         return matcher.matches();
     }

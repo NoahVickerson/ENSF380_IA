@@ -2,6 +2,7 @@ package edu.ucalgary.oop;
 
 import java.io.*;
 import java.util.Random;
+import java.util.Date;
 
 public class ErrorLogger {
     private String fileName;
@@ -25,7 +26,7 @@ public class ErrorLogger {
         try {
             logFile = new RandomAccessFile(fileName, "rw");
             logFile.seek(logFile.length());
-            logFile.writeChars(e.toString() + "\n\n");
+            logFile.writeChars((new Date()).toString() + ": " + e.toString() + "\n\n");
             e.printStackTrace();
         }
         catch (Exception ex) {

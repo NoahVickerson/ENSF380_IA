@@ -19,6 +19,9 @@ public class Person implements DatabaseInterfaceable {
         if (!isValidDateFormat(birthDate)) {
             throw new IllegalArgumentException("Invalid date format: " + birthDate);
         }
+        if(!isValidPhoneNum(phoneNum)){
+            throw new IllegalArgumentException("Invalid phone number format: " + phoneNum);
+        }
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -27,10 +30,56 @@ public class Person implements DatabaseInterfaceable {
         this.phoneNum = phoneNum;
         this.TYPE = type;
         this.familyGroup = null;
-        this.id = counter++;
+        counter++;
+        this.id = counter;
     }
 
     public Person(String firstName, String lastName, String birthDate, String gender, String phoneNum) throws IllegalArgumentException {
+        if (!isValidDateFormat(birthDate)) {
+            throw new IllegalArgumentException("Invalid date format: " + birthDate);
+        }
+        if(!isValidPhoneNum(phoneNum)){
+            throw new IllegalArgumentException("Invalid phone number format: " + phoneNum);
+        }
+
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+        this.gender = gender;
+        this.phoneNum = phoneNum;
+        this.familyGroup = null;
+        this.TYPE = "inquirer";
+        counter++;
+        this.id = counter;
+    }
+
+    public Person(int id, String firstName, String lastName, String birthDate, String gender, String phoneNum, String type) throws IllegalArgumentException {
+        if(id < counter){
+			throw new IllegalArgumentException("id may not be unique");
+		}
+        
+        if (!isValidDateFormat(birthDate)) {
+            throw new IllegalArgumentException("Invalid date format: " + birthDate);
+        }
+
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+        this.gender = gender;
+        this.phoneNum = phoneNum;
+        this.TYPE = type;
+        this.familyGroup = null;
+        this.id = id;
+        if(counter < id){
+            counter = id;
+        }
+    }
+
+    public Person(int id, String firstName, String lastName, String birthDate, String gender, String phoneNum) throws IllegalArgumentException {
+        if(id < counter){
+			throw new IllegalArgumentException("id may not be unique");
+		}
+        
         if (!isValidDateFormat(birthDate)) {
             throw new IllegalArgumentException("Invalid date format: " + birthDate);
         }
@@ -42,7 +91,10 @@ public class Person implements DatabaseInterfaceable {
         this.phoneNum = phoneNum;
         this.familyGroup = null;
         this.TYPE = "inquirer";
-        this.id = counter++;
+        this.id = id;
+        if(counter < id){
+            counter = id;
+        }
     }
 
     public String getFirstName() {
@@ -59,6 +111,14 @@ public class Person implements DatabaseInterfaceable {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public String getComments() {
+        return comments;
     }
 
     public String getDateOfBirth() {
@@ -105,7 +165,7 @@ public class Person implements DatabaseInterfaceable {
                 familyGroup = new FamilyGroup(this, familyMember);
             }
         } else {
-            familyGroup.addFamilyMember(familyMember);
+            familyMember.setFamilyGroup(familyGroup);
         }
 
     }
@@ -115,6 +175,9 @@ public class Person implements DatabaseInterfaceable {
     }
 
     public void setFamilyGroup(FamilyGroup familyGroup) {
+        if(this.familyGroup == familyGroup) {
+            return;
+        }
         if(this.familyGroup != null) {
             this.familyGroup.removeFamilyMember(this);
         }
@@ -152,7 +215,7 @@ public class Person implements DatabaseInterfaceable {
             return true;
         }
 
-        return phoneNum.matches("^[0-9]{3}-[0-9]{3}-[0-9]{4}$") || phoneNum.equalsIgnoreCase("null");
+        return phoneNum.matches("^[0-9]{3}-[0-9]{3}-[0-9]{4}$") || phoneNum.equalsIgnoreCase("null") || phoneNum.matches("^[0-9]{3}-[0-9]{4}$");
     }
 
     public int getId() {
@@ -177,13 +240,13 @@ public class Person implements DatabaseInterfaceable {
 
     public void updateEntry() throws SQLException {
         if (this.familyGroup == null) {
-            String query = "UPDATE Person SET first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, comments = ?, phone_number = ?, family_group = NULL WHERE id = ?";
+            String query = "UPDATE Person SET first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, comments = ?, phone_number = ?, family_group = NULL WHERE person_id = ?";
             String[] values = {firstName, lastName, birthDate, gender, comments, phoneNum, String.valueOf(id)};
             String[] types = {"string", "string", "string", "string", "string", "string", "int"};
             DbConnector db = DbConnector.getInstance();
             db.deadEndQuery(query, values, types);
         }else{
-            String query = "UPDATE Person SET first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, comments = ?, phone_number = ?, family_group = ? WHERE id = ?";
+            String query = "UPDATE Person SET first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, comments = ?, phone_number = ?, family_group = ? WHERE person_id = ?";
             String[] values = {firstName, lastName, birthDate, gender, comments, phoneNum, String.valueOf(familyGroup.getId()), String.valueOf(id)};
             String[] types = {"string", "string", "string", "string", "string", "string", "int", "int"};
             DbConnector db = DbConnector.getInstance();

@@ -21,6 +21,24 @@ public class MedicalRecord implements DatabaseInterfaceable {
         this.id = counter++;
     }
 
+    public MedicalRecord(int id, Location location, DisasterVictim person, String treatmentDetails, String dateOfTreatment) throws IllegalArgumentException {
+        if(id < counter){
+			throw new IllegalArgumentException("id may not be unique");
+		}
+        
+        if(!isValidDateFormat(dateOfTreatment)){
+            throw new IllegalArgumentException("Invalid date format");
+        }
+
+        this.location = location;
+        this.treatmentDetails = treatmentDetails;
+        this.dateOfTreatment = dateOfTreatment;
+        this.id = id;
+        if(counter < id){
+            counter = id;
+        }
+    }
+
     public Location getLocation() {
         return location;
     }

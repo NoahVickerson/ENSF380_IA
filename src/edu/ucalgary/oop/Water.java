@@ -9,6 +9,12 @@ public class Water extends Supply {
         this.setComments(comments);
     }
 
+    public Water(int id, String comments, int quantity) throws IllegalArgumentException {
+        super(id, "Water", quantity);
+
+        this.setComments(comments);
+    }
+
     public Water(String comments, int quantity, String allocationDate) throws IllegalArgumentException {
         super("Water", quantity);
         if (!isValidDateFormat(allocationDate)) {
@@ -25,14 +31,14 @@ public class Water extends Supply {
 
     public void setAllocationDate(String date) throws IllegalArgumentException {
         if (!isValidDateFormat(date)) {
-            throw new IllegalArgumentException("Invalid date format");
+            throw new IllegalArgumentException("Invalid date format: " + date);
         }
         this.allocationDate = date;
     }
 
     public boolean isConsumed(String curDate) throws IllegalArgumentException {
         if (!isValidDateFormat(curDate)) {
-            throw new IllegalArgumentException("Invalid date format");
+            throw new IllegalArgumentException("Invalid date format: " + curDate);
         }
 
         String[] date = allocationDate.split("-");

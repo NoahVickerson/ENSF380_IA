@@ -2,6 +2,9 @@ package edu.ucalgary.oop;
 
 import java.util.Arrays;
 import java.util.Date;
+
+import java.text.SimpleDateFormat;
+
 import java.time.*;
 import java.sql.*;
 
@@ -10,6 +13,7 @@ public class DisasterVictim extends Person {
     private MedicalRecord[] medicalRecords;
     private Supply[] personalBelongings;
     private final String entryDate;
+    private TextInputValidator validator;
 
     public DisasterVictim(String firstName, String lastName, String birthDate, String gender, String phoneNum, String entryDate) throws IllegalArgumentException {
         super(firstName, lastName, birthDate, gender, phoneNum, "disastervictim");
@@ -18,6 +22,17 @@ public class DisasterVictim extends Person {
             throw new IllegalArgumentException("Invalid date format: " +  entryDate);
         }
         this.entryDate = entryDate;
+        validator = TextInputValidator.getInstance();
+    }
+
+    public DisasterVictim(int id, String firstName, String lastName, String birthDate, String gender, String phoneNum, String entryDate) throws IllegalArgumentException {
+        super(id, firstName, lastName, birthDate, gender, phoneNum, "disastervictim");
+
+        if(!isValidDateFormat(entryDate)){
+            throw new IllegalArgumentException("Invalid date format: " +  entryDate);
+        }
+        this.entryDate = entryDate;
+        validator = TextInputValidator.getInstance();
     }
 
     public MedicalRecord[] getMedicalRecords() {
@@ -131,7 +146,11 @@ public class DisasterVictim extends Person {
     }
 
     public void setCurrentLocation(Location currentLocation) {
+        if(this.currentLocation != null){
+            this.currentLocation.removeOccupant(this);
+        }
         this.currentLocation = currentLocation;
+        this.currentLocation.addOccupant(this);
     }
 
     public String getEntryDate() {
@@ -164,33 +183,69 @@ public class DisasterVictim extends Person {
     public void updateEntry() throws SQLException {
         if (this.familyGroup == null) {
             String query = "UPDATE Person SET person_id = ?, first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, comments = ?, phone_number = ?, family_group = NULL WHERE person_id = ?";
-            String[] values = {String.valueOf(id), firstName, lastName, birthDate, gender, comments, phoneNum, String.valueOf(id)};
-            String[] types = {"int", "string", "string", "string", "string", "string", "string", "int"};
+            String[] values = {String.valueOf(id), firstName, lastName, birthDate, validator.translateToLanguage(gender), comments, phoneNum, String.valueOf(id)};
+            String[] types = {"int", "string", "string", "date", "string", "string", "string", "int"};
             DbConnector db = DbConnector.getInstance();
             db.deadEndQuery(query, values, types);
         }else{
-            String query = "UPDATE Person SET person_id = ?, first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, comments = ?, phone_number = ?, family_group = ? WHERE id = ?";
-            String[] values = {String.valueOf(id), firstName, lastName, birthDate, gender, comments, phoneNum, String.valueOf(familyGroup.getId()), String.valueOf(id)};
-            String[] types = {"int", "string", "string", "string", "string", "string", "string", "int", "int"};
+            String query = "UPDATE Person SET person_id = ?, first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, comments = ?, phone_number = ?, family_group = ? WHERE person_id = ?";
+            String[] values = {String.valueOf(id), firstName, lastName, birthDate, validator.translateToLanguage(gender), comments, phoneNum, String.valueOf(familyGroup.getId()), String.valueOf(id)};
+            String[] types = {"int", "string", "string", "date", "string", "string", "string", "int", "int"};
             DbConnector db = DbConnector.getInstance();
             db.deadEndQuery(query, values, types);
         }
 
-        for(Supply s : this.personalBelongings) {
-            s.updateEntry();
-            String query = "INSERT INTO SupplyAllocation (supply_id, person_id, location_id, allocation_date) VALUES (?, ?, ?, ?)";
-            String curDate = (new Date()).toString().substring(0, 10);
-            String[] values = {String.valueOf(s.getId()), String.valueOf(id), "0", curDate};
-            String[] types = {"int", "int", "int", "date"};
-            DbConnector db = DbConnector.getInstance();
-            db.deadEndQuery(query, values, types);
-        }
 
-        String query = "INSERT INTO PersonLocation (person_id, location_id) VALUES (?, ?)";
-        String[] values = {String.valueOf(id), String.valueOf(currentLocation.getId())};
-        String[] types = {"int", "int"};
-        DbConnector db = DbConnector.getInstance();
-        db.deadEndQuery(query, values, types);
+
+        if(this.personalBelongings != null){
+            for(Supply s : this.personalBelongings) {
+                try{
+                    // update in case where supply exists
+                    String query = "UPDATE Supply SET supply_id = ?, person_id = ?, location_id = NULL, allocation_date = ? WHERE supply_id = ?";
+                    String curDate = null;
+                    if(s instanceof Water && ((Water)s).getAllocationDate() != null){
+                        curDate = ((Water)s).getAllocationDate();
+                    }else{
+                        curDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).toString().substring(0, 10);
+                    }
+                    String[] values = {String.valueOf(s.getId()), String.valueOf(id), curDate, String.valueOf(s.getId())};
+                    String[] types = {"int", "int", "date", "int"};
+                    DbConnector db = DbConnector.getInstance();
+                    db.deadEndQuery(query, values, types);
+                } catch (SQLException e) {
+                    s.updateEntry();
+                    String query = "INSERT INTO SupplyAllocation (supply_id, person_id, location_id, allocation_date) VALUES (?, ?, ?, ?)";
+                    String curDate = null;
+                    if(s instanceof Water && ((Water)s).getAllocationDate() != null){
+                        curDate = ((Water)s).getAllocationDate();
+                    }else{
+                        curDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).toString().substring(0, 10);
+                    }
+                    String[] values = {String.valueOf(s.getId()), String.valueOf(id), "NULL", curDate};
+                    String[] types = {"int", "int", "int", "date"};
+                    DbConnector db = DbConnector.getInstance();
+                    db.deadEndQuery(query, values, types);
+                }
+            }
+ 
+        }
+        
+        if(this.currentLocation != null){
+            try{
+                // update in case where location exists
+                String query = "UPDATE PersonLocation SET location_id = ? WHERE person_id = ?";
+                String[] values = {String.valueOf(currentLocation.getId()), String.valueOf(id)};
+                String[] types = {"int", "int"};
+                DbConnector db = DbConnector.getInstance();
+                db.deadEndQuery(query, values, types);
+            } catch (SQLException e) {
+                String query = "INSERT INTO PersonLocation (person_id, location_id) VALUES (?, ?)";
+                String[] values = {String.valueOf(id), String.valueOf(currentLocation.getId())};
+                String[] types = {"int", "int"};
+                DbConnector db = DbConnector.getInstance();
+                db.deadEndQuery(query, values, types);
+            }
+        }
     }
 
 }

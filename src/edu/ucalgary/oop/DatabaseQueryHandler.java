@@ -12,9 +12,9 @@ public interface DatabaseQueryHandler {
         return results;
     }
     public default String getEntries(String tableName, String order) throws SQLException {
-        String query = "SELECT * FROM " + tableName + " ORDER BY ? ASC";
+        String query = "SELECT * FROM " + tableName + " ORDER BY +" + order + " ASC";
         DbConnector db = DbConnector.getInstance();
-        String results = db.returnQuery(query, new String[]{order}, new String[]{"string"});
+        String results = db.returnQuery(query, new String[]{}, new String[]{});
         return results;
     }
 }

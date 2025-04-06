@@ -9,6 +9,12 @@ public class PersonalBelonging extends Supply {
         this.setComments(comments);
     }
 
+    public PersonalBelonging(int id, String description, String comments, int quantity) throws IllegalArgumentException {
+        super(id, "personal belonging", quantity);
+        this.description = description;
+        this.setComments(comments);
+    }
+
     public String getDescription() {
         return description;
     }

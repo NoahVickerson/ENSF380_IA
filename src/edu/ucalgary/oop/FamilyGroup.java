@@ -9,7 +9,8 @@ public class FamilyGroup {
 
     public FamilyGroup() {
         familyMembers = new Person[] {};
-        id = counter++;
+        counter++;
+        id = counter;
     }
 
     public FamilyGroup(Person person1, Person person2) throws IllegalArgumentException {
@@ -19,7 +20,35 @@ public class FamilyGroup {
         familyMembers = new Person[] {person1, person2};
         person1.setFamilyGroup(this);
         person2.setFamilyGroup(this);
-        id = counter++;
+        counter++;
+        id = counter;
+    }
+
+    public FamilyGroup(int id) throws IllegalArgumentException {
+        if (id < counter) {
+            throw new IllegalArgumentException("ID is already in use");
+        }
+        familyMembers = new Person[] {};
+        this.id = id;
+        if(id > counter) {
+            counter = id;
+        }
+    }
+
+    public FamilyGroup(int id, Person person1, Person person2) throws IllegalArgumentException {
+        if (id < counter) {
+            throw new IllegalArgumentException("ID is already in use");
+        }
+        if (person1 == person2) {
+            throw new IllegalArgumentException("Persons cannot be the same");
+        }
+        familyMembers = new Person[] {person1, person2};
+        person1.setFamilyGroup(this);
+        person2.setFamilyGroup(this);
+        this.id = id;
+        if(id > counter) {
+            counter = id;
+        }
     }
 
     public int getId() {
@@ -39,6 +68,7 @@ public class FamilyGroup {
         }
         familyMembers = Arrays.copyOf(familyMembers, familyMembers.length + 1);
         familyMembers[familyMembers.length - 1] = familyMember;
+        familyMember.setFamilyGroup(this);
     }
 
     public void setFamilyMembers(Person[] familyMembers) {

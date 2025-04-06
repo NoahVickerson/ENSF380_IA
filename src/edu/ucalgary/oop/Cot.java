@@ -9,8 +9,22 @@ public class Cot extends Supply {
 
     public Cot(String room, String grid, String comments) throws IllegalArgumentException {
         super("Cot", 1);
-        if (!isValidGrid(grid) || !isValidRoom(room)) {
-            throw new IllegalArgumentException("Grid should be a letter followed by a number");
+        if (!isValidGrid(grid)){
+            throw new IllegalArgumentException("Grid should be a letter followed by a number: " + grid);
+        }else if (!isValidRoom(room)) {
+            throw new IllegalArgumentException("Room should be a letter: " + room);
+        }
+        this.room = room;
+        this.grid = grid;
+        this.comments = comments;
+    }
+
+    public Cot(int id, String room, String grid, String comments) throws IllegalArgumentException {
+        super(id, "Cot", 1);
+        if (!isValidGrid(grid)){
+            throw new IllegalArgumentException("Grid should be a letter followed by a number: " + grid);
+        }else if (!isValidRoom(room)) {
+            throw new IllegalArgumentException("Room should be a letter: " + room);
         }
         this.room = room;
         this.grid = grid;
@@ -27,14 +41,14 @@ public class Cot extends Supply {
 
     public void setRoom(String room) throws IllegalArgumentException {
         if (!isValidRoom(room)) {
-            throw new IllegalArgumentException("Room should be a number");
+            throw new IllegalArgumentException("Room should be a letter");
         }
         this.room = room;
     }
 
     public void setGrid(String grid) throws IllegalArgumentException {
         if (!isValidGrid(grid)) {
-            throw new IllegalArgumentException("Grid should be a letter followed by a number");
+            throw new IllegalArgumentException("Grid should be a letter followed by a number" + grid);
         }
         this.grid = grid;
     }

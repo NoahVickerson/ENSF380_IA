@@ -71,15 +71,27 @@ public class DbConnector implements DatabaseQueryHandler {
 
         PreparedStatement stmt = db.prepareStatement(query);
         for(int i = 0; i < data.length; i++) {
-            if(types[i].equalsIgnoreCase("String")) {
-                stmt.setString(i + 1, data[i]);
-            }
-            else if(types[i].equals("int")) {
-                stmt.setInt(i + 1, Integer.parseInt(data[i]));
-            }
-            else if(types[i].equalsIgnoreCase("date")) {
-                Date date = Date.valueOf(data[i]);
-                stmt.setDate(i + 1, date);
+            if(data[i] == null || data[i].equalsIgnoreCase("null")) {
+                if(types[i].equalsIgnoreCase("String")) {
+                    stmt.setNull(i + 1, Types.VARCHAR);
+                }
+                else if(types[i].equals("int")) {
+                    stmt.setNull(i + 1, Types.INTEGER);
+                }
+                else if(types[i].equalsIgnoreCase("date")) {
+                    stmt.setNull(i + 1, Types.DATE);
+                }
+            }else{
+                if(types[i].equalsIgnoreCase("String")) {
+                    stmt.setString(i + 1, data[i]);
+                }
+                else if(types[i].equals("int")) {
+                    stmt.setInt(i + 1, Integer.parseInt(data[i]));
+                }
+                else if(types[i].equalsIgnoreCase("date")) {
+                    Date date = Date.valueOf(data[i]);
+                    stmt.setDate(i + 1, date);
+                }
             }
         }
         stmt.executeUpdate();

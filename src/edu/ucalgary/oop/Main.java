@@ -41,8 +41,16 @@ public class Main {
         }
 
         cin.close();
+        TextInputValidator validator;
 
-        TextInputValidator validator = new TextInputValidator("../data/" + language + ".xml");  // get the text file from the data dir
+        try{
+            validator = new TextInputValidator("../data/" + language + ".xml");  // get the text file from the data dir
+        }catch(Exception e) {
+            System.out.println("Invalid language file: " + language + ".xml");
+            language = "en-CA";
+            validator = new TextInputValidator("../data/" + language + ".xml");  // get the text file from the data dir
+        }
+
         System.out.println(validator.translateToLanguage("using_lng") + language);
 
         UserInterface ui = new UserInterface(new ErrorLogger("errorlog.txt"), validator);

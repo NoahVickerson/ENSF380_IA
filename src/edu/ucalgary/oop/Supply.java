@@ -2,12 +2,15 @@ package edu.ucalgary.oop;
 
 import java.sql.*;
 
+import org.w3c.dom.Text;
+
 public class Supply implements DatabaseInterfaceable {
     protected final String type;
     protected final int id;
     protected String comments = null;
     protected int quantity;
     protected static int counter = 0;
+    protected TextInputValidator validator;
 
     public Supply(String type, int quantity) throws IllegalArgumentException {
         if (quantity < 0 || !isValidType(type)) {
@@ -15,7 +18,26 @@ public class Supply implements DatabaseInterfaceable {
         }
         this.type = type;
         this.quantity = quantity;
-        this.id = counter++;
+        counter++;
+        this.id = counter;
+        validator = TextInputValidator.getInstance();
+    }
+
+    public Supply(int id, String type, int quantity) throws IllegalArgumentException {
+        if(id < counter){
+			throw new IllegalArgumentException("id may not be unique");
+		}
+        
+        if (quantity < 0 || !isValidType(type)) {
+            throw new IllegalArgumentException("Invalid supply type: " + type + " or quantity: " + quantity);
+        }
+        this.type = type;
+        this.quantity = quantity;
+        this.id = id;
+        if(counter < id){
+            counter = id;
+        }
+        validator = TextInputValidator.getInstance();
     }
 
     public String getType() {
@@ -58,7 +80,7 @@ public class Supply implements DatabaseInterfaceable {
     }
 
     public void updateEntry() throws SQLException {
-        String query = "UPDATE Supply SET type = ?, comments = ? WHERE id = ?";
+        String query = "UPDATE Supply SET type = ?, comments = ? WHERE supply_id = ?";
         String[] values = {type, comments, String.valueOf(id)};
         String[] types = {"string", "string", "int"};
         DbConnector db = DbConnector.getInstance();
