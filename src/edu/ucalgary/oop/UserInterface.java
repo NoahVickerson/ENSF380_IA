@@ -702,7 +702,7 @@ public class UserInterface extends JFrame {
                 try {
                     if (type.equals(types[0])) {
                         if(!validator.isValidQuantity(quantityInputWater.getText())) {
-                            throw new IllegalArgumentException("inv_quantity");
+                            throw new IllegalArgumentException(validator.translateToLanguage("inv_quantity") + quantityInputWater.getText());
                         }
                         quantity = Integer.parseInt(quantityInputWater.getText());
                         comments = commentsInputWater.getText();
@@ -720,7 +720,7 @@ public class UserInterface extends JFrame {
                         }
                     } else if (type.equals(types[1])) {
                         if(!validator.isValidQuantity(quantityInputWater.getText())) {
-                            throw new IllegalArgumentException("inv_quantity");
+                            throw new IllegalArgumentException(validator.translateToLanguage("inv_quantity") + quantityInputBlanket.getText());
                         }
                         quantity = Integer.parseInt(quantityInputBlanket.getText());
                         comments = commentsInputBlanket.getText();
@@ -948,9 +948,41 @@ public class UserInterface extends JFrame {
 
 
         // allow adding supplies
-        personPanel.add(new JLabel(validator.translateToLanguage("add_supply")));
+        Supply[] locationSupplies = person.getCurrentLocation().getSupplies();
+        personPanel.add(new JLabel(validator.translateToLanguage("hr")));
+        personPanel.add(new JLabel(validator.translateToLanguage("supplies")));
 
-        JButton updatePerson = new JButton(validator.translateToLanguage("update"));
+        if(locationSupplies != null) {
+
+            ArrayList<String> supplyNames = new ArrayList<>();
+
+            for (int i = 0; i < locationSupplies.length; i++) {
+                supplyNames.add(locationSupplies[i].getType() + " (" + locationSupplies[i].getId() + ")");
+            }
+
+            JComboBox supplyInput = new JComboBox(supplyNames.toArray());
+
+            JButton addSupply = new JButton(validator.translateToLanguage("add_supply"));
+
+            personPanel.add(supplyInput);
+            personPanel.add(addSupply);
+            addSupply.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        controller.reflectSupplyTransfer(person, locationSupplies[supplyInput.getSelectedIndex()]);
+                        displayError(validator.translateToLanguage("supply_transfer_success"));
+                    } catch (IllegalArgumentException e1) {
+                        displayError(validator.translateToLanguage("supply_transfer_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                    } catch (SQLException e1) {
+                        logger.logError(e1);
+                        exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
+                    }
+                }
+            });
+        }   
+
+        JButton updatePerson = new JButton(validator.translateToLanguage("update") + " " + validator.translateToLanguage("person"));
 
         updatePerson.addActionListener(new ActionListener() {
             @Override
@@ -1323,6 +1355,19 @@ public class UserInterface extends JFrame {
                     personPanels[i].add(new JLabel(validator.translateToLanguage("id") + location.getId()));
                 }
                 personContent.add(peopleNames[i], personPanels[i]);
+
+                if(person.getMedicalRecords() != null){
+                    MedicalRecord[] medicalRecords = person.getMedicalRecords();
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("hr")));
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("medical")));
+                    personPanels[i].add(new JLabel(validator.translateToLanguage("hr")));
+                    for(MedicalRecord medicalRecord : medicalRecords){
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("date_of_treatment") + medicalRecord.getDateOfTreatment()));
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("location") + ": " + medicalRecord.getLocation().getName()));
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("comments") + medicalRecord.getTreatmentDetails()));
+                        personPanels[i].add(new JLabel(validator.translateToLanguage("hr")));
+                    }
+                }
             }
         }
 

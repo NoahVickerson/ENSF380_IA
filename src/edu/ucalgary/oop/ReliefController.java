@@ -632,5 +632,11 @@ public class ReliefController {
         }
     }
 
-
+    public void reflectSupplyTransfer(DisasterVictim victim, Supply supply) throws SQLException, IllegalArgumentException {
+        victim.transferSupply(supply);
+        String query = "DELETE FROM SupplyAllocation WHERE location_id = " + victim.getCurrentLocation().getId() + " AND supply_id = " + supply.getId();
+        String[] args = new String[0];
+        String[] types = new String[0];
+        fetcher.deadEndQuery(query, args, types);
+    }
 }

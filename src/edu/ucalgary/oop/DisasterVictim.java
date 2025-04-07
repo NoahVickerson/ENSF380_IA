@@ -98,7 +98,7 @@ public class DisasterVictim extends Person {
         }
     }
 
-    public void removePersonalBelonging(Supply supply){
+    public void removePersonalBelonging(Supply supply) throws IllegalArgumentException{
         Supply[] smallerBelongings = new Supply[personalBelongings.length - 1];
         int index = 0;
         boolean foundSupply = false;
@@ -112,12 +112,12 @@ public class DisasterVictim extends Person {
         }
 
         if(!foundSupply){
-            return;
+            throw new IllegalArgumentException("The supply is not in the personal belongings");
         }
         personalBelongings = smallerBelongings;
     }
 
-    public void transferSupply(Supply supply) throws IllegalArgumentException{
+    public void transferSupply(Supply supply) throws IllegalArgumentException {
         if(!this.currentLocation.containsSupply(supply)){
             throw new IllegalArgumentException("The supply is not in the current location");
         }
@@ -198,7 +198,6 @@ public class DisasterVictim extends Person {
         if(this.personalBelongings != null){
             for(Supply s : this.personalBelongings) {
                 try{
-                    System.out.println(this.firstName);
                     String query = "INSERT INTO SupplyAllocation (supply_id, person_id, location_id, allocation_date) VALUES (?, ?, ?, ?)";
                     String curDate = null;
                     if(s instanceof Water && ((Water)s).getAllocationDate() != null){

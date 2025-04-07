@@ -87,7 +87,7 @@ public class TextInputValidator {
 
     
     public static boolean isValidQuantity(String quantity){
-        if(!isNumeric(quantity)){
+        if(!quantity.matches("^\\d+$")){
             return false;
         }
         return Integer.parseInt(quantity) >= 0;
