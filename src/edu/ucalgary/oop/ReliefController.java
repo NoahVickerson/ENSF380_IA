@@ -40,6 +40,8 @@ public class ReliefController {
         loadInquiries();
 
         loadSupplies();
+
+        loadMedicalRecords();
     }
 
     private ReliefController() {
@@ -575,4 +577,28 @@ public class ReliefController {
             }
         }
     }
+
+    public void loadMedicalRecords() throws SQLException {
+        String rs = fetcher.getEntries("MedicalRecord", "medical_record_id");
+
+        String[] rows = rs.split("\n");
+
+        for (String row : rows) {
+            String[] columns = row.split("<\t>");
+
+            int medical_record_id = Integer.parseInt(columns[0]);
+            Location location = fetchLocation(Integer.parseInt(columns[1]));
+            DisasterVictim victim = fetchVictim(Integer.parseInt(columns[2]));
+            String treatment_details = columns[4];
+            String date_of_treatment = columns[3];
+
+            if(!date_of_treatment.equals("null") && date_of_treatment != null) {
+                date_of_treatment = date_of_treatment.substring(0, 10);
+            }
+
+            fetchVictim(victim.getId()).addMedicalRecord(new MedicalRecord(medical_record_id, location, victim, treatment_details, date_of_treatment));
+        }
+    }
+
+
 }

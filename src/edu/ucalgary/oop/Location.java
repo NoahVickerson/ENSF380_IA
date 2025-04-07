@@ -147,7 +147,7 @@ public class Location implements DatabaseInterfaceable{
 	}
 
 	public void addEntry() throws SQLException {
-		String query = "INSERT INTO Location (name, address) VALUES (?, ?)";
+		String query = "INSERT INTO Location (location_id, name, address) VALUES (?, ?, ?)";
 		String[] values = {name, address};
 		String[] types = {"string", "string"};
 		DbConnector db = DbConnector.getInstance();
@@ -155,7 +155,7 @@ public class Location implements DatabaseInterfaceable{
 	}
 
 	public void updateEntry() throws SQLException {
-		String query = "UPDATE Location SET name = ?, address = ? WHERE id = ?";
+		String query = "UPDATE Location SET name = ?, address = ? WHERE location_id = ?";
 		String[] values = {name, address, String.valueOf(id)};
 		String[] types = {"string", "string", "int"};
 		DbConnector db = DbConnector.getInstance();

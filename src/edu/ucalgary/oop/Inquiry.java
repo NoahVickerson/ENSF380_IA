@@ -13,6 +13,10 @@ public class Inquiry implements DatabaseInterfaceable {
     private static int counter = 0;
 
     public Inquiry(Person inquirer, DisasterVictim missingPerson, String dateOfInquiry, String infoProvided, Location lastKnownLocation) throws IllegalArgumentException {
+        if(inquirer == missingPerson){
+            throw new IllegalArgumentException("Inquirer and missing person cannot be the same");
+        }
+        
         if(!isValidDateFormat(dateOfInquiry)){
             throw new IllegalArgumentException("Invalid Date: " + dateOfInquiry);
         }
@@ -30,6 +34,10 @@ public class Inquiry implements DatabaseInterfaceable {
         if(id < counter){
 			throw new IllegalArgumentException("id may not be unique");
 		}
+
+        if(inquirer == missingPerson){
+            throw new IllegalArgumentException("Inquirer and missing person cannot be the same");
+        }
         
         if(!isValidDateFormat(dateOfInquiry)){
             throw new IllegalArgumentException("Invalid Date: " + dateOfInquiry);
@@ -83,8 +91,8 @@ public class Inquiry implements DatabaseInterfaceable {
     }
 
     public void addEntry() throws SQLException {
-        String query = "INSERT INTO Inquiry (inquirer_id, seeking_id, location_id, date_of_inquiry, comments) VALUES (?, ?, ?, ?, ?)";
-        String[] values = {String.valueOf(inquirer.getId()), String.valueOf(missingPerson.getId()), String.valueOf(lastKnownLocation.getId()), dateOfInquiry, infoProvided};
+        String query = "INSERT INTO Inquiry (inquiry_id, inquirer_id, seeking_id, location_id, date_of_inquiry, comments) VALUES (?, ?, ?, ?, ?, ?)";
+        String[] values = {String.valueOf(id), String.valueOf(inquirer.getId()), String.valueOf(missingPerson.getId()), String.valueOf(lastKnownLocation.getId()), dateOfInquiry, infoProvided};
         String[] types = {"int", "int", "int", "date", "string"};
 
         DbConnector db = DbConnector.getInstance();
@@ -92,7 +100,7 @@ public class Inquiry implements DatabaseInterfaceable {
     }
 
     public void updateEntry() throws SQLException {
-        String query = "UPDATE Inquiry SET inquirer_id = ?, seeking_id = ?, location_id = ?, date_of_inquiry = ?, comments = ? WHERE id = ?";
+        String query = "UPDATE Inquiry SET inquirer_id = ?, seeking_id = ?, location_id = ?, date_of_inquiry = ?, comments = ? WHERE inquiry_id = ?";
         String[] values = {String.valueOf(inquirer.getId()), String.valueOf(missingPerson.getId()), String.valueOf(lastKnownLocation.getId()), dateOfInquiry, infoProvided, String.valueOf(id)};
         String[] types = {"int", "int", "int", "date", "string", "int"};
 

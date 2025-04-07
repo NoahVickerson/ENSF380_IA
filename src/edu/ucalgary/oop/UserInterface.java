@@ -517,11 +517,62 @@ public class UserInterface extends JFrame {
         return locationPanel;
     }
 
-    public JPanel createMedicalRecord() {
+    public JPanel createMedicalRecord(DisasterVictim person) {
         JPanel medicalRecordPanel = new JPanel();
+        medicalRecordPanel.setLayout(new BoxLayout(medicalRecordPanel, BoxLayout.Y_AXIS));
 
         JLabel createMedicalRecord = new JLabel(validator.translateToLanguage("add_record"));
         medicalRecordPanel.add(createMedicalRecord);
+
+        medicalRecordPanel.add(new JLabel(validator.translateToLanguage("location_prompt")));
+
+        if(controller.getLocations() == null){
+            throw new IllegalArgumentException(validator.translateToLanguage("no_locations"));
+        }
+        Location[] locations = controller.getLocations();
+        String[] locationNames = new String[locations.length];
+
+        for(int i = 0; i < locations.length; i++){
+            locationNames[i] = locations[i].getName();
+        }
+
+        JComboBox locationInput = new JComboBox(locationNames);
+        medicalRecordPanel.add(locationInput);
+
+        medicalRecordPanel.add(new JLabel(validator.translateToLanguage("details_prompt")));
+        JTextField detailsInput = new JTextField(15);
+        medicalRecordPanel.add(detailsInput);
+
+        medicalRecordPanel.add(new JLabel(validator.translateToLanguage("date_prompt")));
+        JTextField dateInput = new JTextField(validator.translateToLanguage("ex_date"), 15);
+        medicalRecordPanel.add(dateInput);
+
+        JButton submitButton = new JButton(validator.translateToLanguage("add_record"));
+        medicalRecordPanel.add(submitButton);
+        
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Location location = controller.fetchLocation(locationInput.getSelectedItem().toString());
+                String details = detailsInput.getText();
+                String date = dateInput.getText();
+
+                try {
+                    MedicalRecord medicalRecord = new MedicalRecord(location, person, details, date);
+                    person.addMedicalRecord(medicalRecord);
+                    displayError(validator.translateToLanguage("update_medical_record_success"));
+                    medicalRecord.addEntry();
+                } catch (IllegalArgumentException e1) {
+                    e1.printStackTrace();
+                    displayError(validator.translateToLanguage("update_medical_record_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                } catch (SQLException e1) {
+                    logger.logError(e1);
+                    exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
+                }
+            }
+        });
+
+                
 
         return medicalRecordPanel;
     }
@@ -848,18 +899,16 @@ public class UserInterface extends JFrame {
         personPanel.add(locationInput);
 
         // allow adding medical records
+        personPanel.add(new JLabel(validator.translateToLanguage("hr")));
         personPanel.add(new JLabel(validator.translateToLanguage("medical")));
 
         if(person.getMedicalRecords() != null) {
             JPanel medicalPanel = new JPanel(new CardLayout());
-            medicalPanel.setLayout(new BoxLayout(medicalPanel, BoxLayout.Y_AXIS));
 
             MedicalRecord[] medicalRecords = person.getMedicalRecords();
-            String[] medicalRecordNames = new String[medicalRecords.length + 2];
-            ArrayList<String> medicalRecordNamesList = new ArrayList<String>();
+            String[] medicalRecordNames = new String[medicalRecords.length + 1];
 
             for (int i = 0; i < medicalRecords.length; i++) {
-                medicalRecordNamesList.add(medicalRecords[i].getDateOfTreatment());
                 medicalRecordNames[i] = medicalRecords[i].getDateOfTreatment();
             }
 
@@ -873,12 +922,25 @@ public class UserInterface extends JFrame {
                 medicalRecordPanels[i] = updateMedicalRecord(medicalRecords[i]);
             }
 
-            medicalRecordPanels[medicalRecords.length] = createMedicalRecord();
+            medicalRecordPanels[medicalRecords.length] = createMedicalRecord(person);
+
+            for (int i = 0; i < medicalRecordPanels.length; i++) {
+                medicalPanel.add(medicalRecordPanels[i], medicalRecordNames[i]);
+            }
+
+            medicalInput.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    CardLayout cl = (CardLayout) medicalPanel.getLayout();
+                    cl.show(medicalPanel, (String) medicalInput.getSelectedItem());
+                }
+            });
+            
 
             personPanel.add(medicalInput);
             personPanel.add(medicalPanel);
         }else{
-            personPanel.add(createMedicalRecord());
+            personPanel.add(createMedicalRecord(person));
         }
 
 
@@ -913,32 +975,163 @@ public class UserInterface extends JFrame {
         return personPanel;
     }
 
+    public JPanel updateSingleLocation(Location location) {
+        JPanel locationPanel = new JPanel();
+        locationPanel.setLayout(new BoxLayout(locationPanel, BoxLayout.Y_AXIS));
+
+        JLabel location_prompt = new JLabel(validator.translateToLanguage("name"));
+        JTextField nameInput = new JTextField(location.getName(), 15);
+        JLabel address_prompt = new JLabel(validator.translateToLanguage("address"));
+        JTextField addressInput = new JTextField(location.getAddress(), 15);
+
+        locationPanel.add(location_prompt);
+        locationPanel.add(nameInput);
+        locationPanel.add(address_prompt);
+        locationPanel.add(addressInput);
+
+        JButton updateLocation = new JButton(validator.translateToLanguage("update"));
+
+        updateLocation.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    location.setName(nameInput.getText());
+                    location.setAddress(addressInput.getText());
+                    location.updateEntry();
+                    displayError(validator.translateToLanguage("update_location_success"));
+                } catch (IllegalArgumentException e1) {
+                    displayError(validator.translateToLanguage("update_location_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                } catch (SQLException e1) {
+                    logger.logError(e1);
+                    exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
+                }
+            }
+        });
+        locationPanel.add(updateLocation);
+
+        return locationPanel;
+    }
+
     public JPanel updateInquiry() {
         JPanel inquiryPanel = new JPanel();
         inquiryPanel.setLayout(new BoxLayout(inquiryPanel, BoxLayout.Y_AXIS));
 
         inquiryPanel.add(new JLabel(validator.translateToLanguage("update_inquiry")));
 
+        Inquiry[] inquiries = controller.getInquiries();
+
+        if(inquiries == null) {
+            inquiryPanel.add(new JLabel(validator.translateToLanguage("no_inquiries")));
+            return inquiryPanel;
+        }
+
+        String[] inquiryNames = new String[inquiries.length];
+
+        for (int i = 0; i < inquiries.length; i++) {
+            inquiryNames[i] = inquiries[i].getInquirer().getFirstName() + " " + inquiries[i].getInquirer().getLastName() + " - " + inquiries[i].getMissingPerson().getFirstName() + " " + inquiries[i].getMissingPerson().getLastName() + " - " + inquiries[i].getDateOfInquiry();
+        }
+
+        JComboBox inquiryInput = new JComboBox(inquiryNames);
+
+        inquiryPanel.add(inquiryInput);
+
+        JPanel inquiryContent = new JPanel(new CardLayout());
+
+        JPanel[] inquiryPanels = new JPanel[inquiries.length];
+
+        for (int i = 0; i < inquiries.length; i++) {
+            inquiryPanels[i] = updateSingleInquiry(inquiries[i]);
+            inquiryContent.add(inquiryPanels[i], inquiryNames[i]);
+        }
+
+        inquiryInput.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                CardLayout cl = (CardLayout) inquiryContent.getLayout();
+                cl.show(inquiryContent, (String) inquiryInput.getSelectedItem());
+            }
+        });
+        inquiryPanel.add(inquiryContent);
+
         return inquiryPanel;
     }
 
+    public JPanel updateSingleInquiry(Inquiry inquiry) {
+        JPanel inquiryPanel = new JPanel();
+        inquiryPanel.setLayout(new BoxLayout(inquiryPanel, BoxLayout.Y_AXIS));
+
+        Person[] persons = controller.getPeople();
+        DisasterVictim[] victims = controller.getVictims();
+        String[] personNames = new String[persons.length];
+
+        for (int i = 0; i < persons.length; i++) {
+            personNames[i] = persons[i].getFirstName() + " " + persons[i].getLastName();
+        }
+
+        JComboBox inquirerInput = new JComboBox(personNames);
+
+        if(inquiry.getInquirer() != null) {
+            inquirerInput.setSelectedItem(inquiry.getInquirer().getFirstName() + " " + inquiry.getInquirer().getLastName());
+        }
+
+        JLabel treatmentDetails = new JLabel(validator.translateToLanguage("treatment_details"));
+        JTextField treatmentDetailsInput = new JTextField(inquiry.getInfoProvided(), 15);
+
+
+        Location[] locations = controller.getLocations();
+        String[] locationNames = new String[locations.length];
+
+        for (int i = 0; i < locations.length; i++) {
+            locationNames[i] = locations[i].getName();
+        }
+
+        JComboBox locationInput = new JComboBox(locationNames);
+
+        if(inquiry.getLastKnownLocation() != null) {
+            locationInput.setSelectedItem(inquiry.getLastKnownLocation().getName());
+        }
+
+        inquiryPanel.add(new JLabel(validator.translateToLanguage("inquiry_immutable")));
+
+        JButton updateInquiry = new JButton(validator.translateToLanguage("update"));
+
+        inquiryPanel.add(new JLabel(validator.translateToLanguage("inquirer")));
+        inquiryPanel.add(inquirerInput);
+        inquiryPanel.add(treatmentDetails);
+        inquiryPanel.add(treatmentDetailsInput);
+        inquiryPanel.add(new JLabel(validator.translateToLanguage("location")));
+        inquiryPanel.add(locationInput);
+        inquiryPanel.add(updateInquiry);
+
+        updateInquiry.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Person inquirer = controller.fetchPerson(inquirerInput.getSelectedItem().toString().split(" ")[0], inquirerInput.getSelectedItem().toString().split(" ")[1]);
+                    Location location = controller.fetchLocation(locationInput.getSelectedItem().toString());
+
+                    inquiry.setInquirer(inquirer);
+                    inquiry.setInfoProvided(treatmentDetailsInput.getText());
+                    inquiry.setLastKnownLocation(location);
+                    inquiry.updateEntry();
+                    displayError(validator.translateToLanguage("update_inquiry_success"));
+                } catch (IllegalArgumentException e1) {
+                    displayError(validator.translateToLanguage("update_inquiry_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                } catch (SQLException e1) {
+                    logger.logError(e1);
+                    exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
+                }
+            }
+        });
+
+        return inquiryPanel;
+    }
+        
     public JPanel updateMedicalRecord(MedicalRecord medicalRecord) {
         JPanel medicalPanel = new JPanel();
         medicalPanel.setLayout(new BoxLayout(medicalPanel, BoxLayout.Y_AXIS));
 
-        JLabel dateOfTreatment = new JLabel(validator.translateToLanguage("date_of_treatment"));
-        JTextField dateOfTreatmentInput = new JTextField(medicalRecord.getDateOfTreatment(), 15);
-
-        medicalPanel.add(dateOfTreatment);
-        medicalPanel.add(dateOfTreatmentInput);
-
-        return medicalPanel;
-    }
-
-    public JPanel updateLocation() {
-        JPanel locationPanel = new JPanel();
-        locationPanel.setLayout(new BoxLayout(locationPanel, BoxLayout.Y_AXIS));
-
+        JLabel location_prompt = new JLabel(validator.translateToLanguage("location"));
         Location[] locations = controller.getLocations();
         String[] locationNames = new String[locations.length];
         ArrayList<String> locationList = new ArrayList<String>();
@@ -950,7 +1143,77 @@ public class UserInterface extends JFrame {
 
         JComboBox locationInput = new JComboBox(locationNames);
 
+        if(medicalRecord.getLocation() != null) {
+            locationInput.setSelectedItem(medicalRecord.getLocation().getName());
+        }
+
+        medicalPanel.add(locationInput);
+        JLabel dateOfTreatment = new JLabel(validator.translateToLanguage("date_of_treatment"));
+        JTextField dateOfTreatmentInput = new JTextField(medicalRecord.getDateOfTreatment(), 15);
+
+        JLabel treatmentDetails = new JLabel(validator.translateToLanguage("treatment_details"));
+        JTextArea treatmentDetailsInput = new JTextArea(medicalRecord.getTreatmentDetails(), 3, 20);
+
+
+        medicalPanel.add(location_prompt);
+        medicalPanel.add(locationInput);
+        medicalPanel.add(dateOfTreatment);
+        medicalPanel.add(dateOfTreatmentInput);
+        medicalPanel.add(treatmentDetails);
+        medicalPanel.add(treatmentDetailsInput);
+
+        JButton updateMedicalRecord = new JButton(validator.translateToLanguage("data_update"));
+        updateMedicalRecord.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    medicalRecord.setLocation(controller.fetchLocation(locationInput.getSelectedItem().toString()));
+                    medicalRecord.setDateOfTreatment(dateOfTreatmentInput.getText());
+                    medicalRecord.setTreatmentDetails(treatmentDetailsInput.getText());
+                    medicalRecord.updateEntry();
+                    displayError(validator.translateToLanguage("update_medical_record_success"));
+                } catch (IllegalArgumentException e1) {
+                    displayError(validator.translateToLanguage("update_medical_record_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                } catch (SQLException e1) {
+                    logger.logError(e1);
+                    exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
+                }
+            }
+        });
+        medicalPanel.add(updateMedicalRecord);
+        return medicalPanel;
+    }
+
+    public JPanel updateLocation() {
+        JPanel locationPanel = new JPanel();
+        locationPanel.setLayout(new BoxLayout(locationPanel, BoxLayout.Y_AXIS));
+
+        Location[] locations = controller.getLocations();
+        String[] locationNames = new String[locations.length];
+        JPanel[] locationPanels = new JPanel[locations.length];
+        JPanel locationContent = new JPanel(new CardLayout());
+
+        for (int i = 0; i < locations.length; i++) {
+            locationNames[i] = locations[i].getName();
+            locationPanels[i] = updateSingleLocation(locations[i]);
+        }
+
+        JComboBox locationInput = new JComboBox(locationNames);
+
+        for(int i = 0; i < locations.length; i++) {
+            locationContent.add(locationPanels[i], locationNames[i]);
+        }
+
+        locationInput.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CardLayout cl = (CardLayout) locationContent.getLayout();
+                cl.show(locationContent, locationInput.getSelectedItem().toString());
+            }
+        });
+
         locationPanel.add(locationInput);
+        locationPanel.add(locationContent);
 
         return locationPanel;
     }
