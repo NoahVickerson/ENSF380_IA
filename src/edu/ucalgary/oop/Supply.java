@@ -72,9 +72,9 @@ public class Supply implements DatabaseInterfaceable {
     }
 
     public void addEntry() throws SQLException {
-        String query = "INSERT INTO Supply (type, comments) VALUES (?, ?)";
-        String[] values = {type, comments};
-        String[] types = {"string", "string"};
+        String query = "INSERT INTO Supply (supply_id, type, comments) VALUES (?, ?, ?)";
+        String[] values = {String.valueOf(id), type, comments};
+        String[] types = {"int", "string", "string"};
         DbConnector db = DbConnector.getInstance();
         db.deadEndQuery(query, values, types);
     }

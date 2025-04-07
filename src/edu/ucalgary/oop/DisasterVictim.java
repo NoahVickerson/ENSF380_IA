@@ -195,25 +195,10 @@ public class DisasterVictim extends Person {
             db.deadEndQuery(query, values, types);
         }
 
-
-
         if(this.personalBelongings != null){
             for(Supply s : this.personalBelongings) {
                 try{
-                    // update in case where supply exists
-                    String query = "UPDATE Supply SET supply_id = ?, person_id = ?, location_id = NULL, allocation_date = ? WHERE supply_id = ?";
-                    String curDate = null;
-                    if(s instanceof Water && ((Water)s).getAllocationDate() != null){
-                        curDate = ((Water)s).getAllocationDate();
-                    }else{
-                        curDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).toString().substring(0, 10);
-                    }
-                    String[] values = {String.valueOf(s.getId()), String.valueOf(id), curDate, String.valueOf(s.getId())};
-                    String[] types = {"int", "int", "date", "int"};
-                    DbConnector db = DbConnector.getInstance();
-                    db.deadEndQuery(query, values, types);
-                } catch (SQLException e) {
-                    s.updateEntry();
+                    System.out.println(this.firstName);
                     String query = "INSERT INTO SupplyAllocation (supply_id, person_id, location_id, allocation_date) VALUES (?, ?, ?, ?)";
                     String curDate = null;
                     if(s instanceof Water && ((Water)s).getAllocationDate() != null){
@@ -223,6 +208,19 @@ public class DisasterVictim extends Person {
                     }
                     String[] values = {String.valueOf(s.getId()), String.valueOf(id), "NULL", curDate};
                     String[] types = {"int", "int", "int", "date"};
+                    DbConnector db = DbConnector.getInstance();
+                    db.deadEndQuery(query, values, types);
+                } catch (SQLException e) {
+                    // update in case where supply exists
+                    String query = "UPDATE SupplyAllocation SET supply_id = ?, person_id = ?, location_id = NULL, allocation_date = ? WHERE supply_id = ?";
+                    String curDate = null;
+                    if(s instanceof Water && ((Water)s).getAllocationDate() != null){
+                        curDate = ((Water)s).getAllocationDate();
+                    }else{
+                        curDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).toString().substring(0, 10);
+                    }
+                    String[] values = {String.valueOf(s.getId()), String.valueOf(id), curDate, String.valueOf(s.getId())};
+                    String[] types = {"int", "int", "date", "int"};
                     DbConnector db = DbConnector.getInstance();
                     db.deadEndQuery(query, values, types);
                 }

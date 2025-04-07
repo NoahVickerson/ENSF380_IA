@@ -501,7 +501,7 @@ public class UserInterface extends JFrame {
         locationPanel.add(locationAddress);
         locationPanel.add(locationAddressInput);
 
-        JButton submitButton = new JButton(validator.translateToLanguage("add_loc"));
+        JButton submitButton = new JButton(validator.translateToLanguage("validate"));
         locationPanel.add(submitButton);
 
         submitButton.addActionListener(new ActionListener() {
@@ -511,6 +511,7 @@ public class UserInterface extends JFrame {
                 address.setLength(0);
                 name.append(locationNameInput.getText());
                 address.append(locationAddressInput.getText());
+                displayError(validator.translateToLanguage("loc_val"));
             }
         });
 
@@ -623,15 +624,11 @@ public class UserInterface extends JFrame {
 
         JPanel cotPanel = new JPanel();
 
-        JLabel commentsCot = new JLabel(validator.translateToLanguage("comments"));
-        JTextField commentsInputCot = new JTextField(15);
         JLabel roomLabel = new JLabel(validator.translateToLanguage("room"));
         JTextField roomInput = new JTextField(15);
         JLabel gridLabel = new JLabel(validator.translateToLanguage("grid"));
         JTextField gridInput = new JTextField(15);
 
-        cotPanel.add(commentsCot);
-        cotPanel.add(commentsInputCot);
         cotPanel.add(roomLabel);
         cotPanel.add(roomInput);
         cotPanel.add(gridLabel);
@@ -714,9 +711,11 @@ public class UserInterface extends JFrame {
 
                         if(supplyHolderPerson != null) {
                             supplyHolderPerson.addSupply(water);
+                            water.addEntry();
                             supplyHolderPerson.updateEntry();
                         } else {
                             supplyHolderLocation.addSupply(water);
+                            water.addEntry();
                             supplyHolderLocation.updateEntry();
                         }
                     } else if (type.equals(types[1])) {
@@ -732,13 +731,14 @@ public class UserInterface extends JFrame {
 
                         if(supplyHolderPerson != null) {
                             supplyHolderPerson.addSupply(blanket);
+                            blanket.addEntry();
                             supplyHolderPerson.updateEntry();
                         } else {
                             supplyHolderLocation.addSupply(blanket);
+                            blanket.addEntry();
                             supplyHolderLocation.updateEntry();
                         }
                     } else if (type.equals(types[2])) {
-                        comments = commentsInputCot.getText();
                         String room = roomInput.getText();
                         String grid = gridInput.getText();
 
@@ -746,13 +746,15 @@ public class UserInterface extends JFrame {
                             throw new IllegalArgumentException("inv_room_grid");
                         }
 
-                        Cot cot = new Cot(room, grid, comments);
+                        Cot cot = new Cot(room, grid, room + grid);
 
                         if(supplyHolderPerson != null) {
                             supplyHolderPerson.addSupply(cot);
+                            cot.addEntry();
                             supplyHolderPerson.updateEntry();
                         } else {
                             supplyHolderLocation.addSupply(cot);
+                            cot.addEntry();
                             supplyHolderLocation.updateEntry();
                         }
                     } else if (type.equals(types[3])) {
@@ -767,6 +769,7 @@ public class UserInterface extends JFrame {
 
                         if(supplyHolderPerson != null) {
                             supplyHolderPerson.addSupply(belonging);
+                            belonging.addEntry();
                             supplyHolderPerson.updateEntry();
                         } else {
                             throw new IllegalArgumentException("pb_only_person");

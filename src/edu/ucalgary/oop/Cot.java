@@ -60,7 +60,7 @@ public class Cot extends Supply {
     }
 
     private static boolean isValidRoom(String room) {
-        Pattern pattern = Pattern.compile("^\\d+$");
+        Pattern pattern = Pattern.compile("^[A-Za-z]*$");
         Matcher matcher = pattern.matcher(room);
         return matcher.matches();
     }

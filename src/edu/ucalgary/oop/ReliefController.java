@@ -381,6 +381,10 @@ public class ReliefController {
         for (String row : rows) {
             String[] columns = row.split("<\t>");
 
+            if(columns[0].equals("")){
+                return;
+            }
+
             int location_id = Integer.parseInt(columns[0]);
             String name = columns[1];
             String address = columns[2];
@@ -398,6 +402,10 @@ public class ReliefController {
 
         for (String row : rows) {
             String[] columns = row.split("<\t>");
+
+            if(columns[0].equals("")){
+                return;
+            }
 
             int person_id = Integer.parseInt(columns[0]);
             String first_name = columns[1];
@@ -428,6 +436,10 @@ public class ReliefController {
         for (String row : rows) {
             String[] columns = row.split("<\t>");
 
+            if(columns[0].equals("")){
+                return;
+            }
+
             int person_id = Integer.parseInt(columns[0]);
             int location_id = Integer.parseInt(columns[1]);
 
@@ -443,6 +455,10 @@ public class ReliefController {
 
         for (String row : rows) {
             String[] columns = row.split("<\t>");
+
+            if(columns[0].equals("")){
+                return;
+            }
 
             if(columns[7].equalsIgnoreCase("null")) {
                 continue;
@@ -471,6 +487,10 @@ public class ReliefController {
         for (String row : rows) {
             String[] columns = row.split("<\t>");
 
+            if(columns[0].equals("")){
+                return;
+            }
+
             int inquiry_id = Integer.parseInt(columns[0]);
             int inquirer_id = Integer.parseInt(columns[1]);
             int seeking_id = Integer.parseInt(columns[2]);
@@ -497,6 +517,10 @@ public class ReliefController {
 
         for (String row : rows) {
             String[] columns = row.split("<\t>");
+
+            if(columns[0].equals("")){
+                return;
+            }
 
             int id = Integer.parseInt(columns[0]);
             String type = columns[1];
@@ -535,6 +559,10 @@ public class ReliefController {
         rows = rs.split("\n");
 
         for (String row : rows) {
+            if(row.equals("")) {
+                return;
+            }
+
             String[] columns = row.split("<\t>");
 
             if(columns[1].equalsIgnoreCase("null")) {
@@ -585,6 +613,10 @@ public class ReliefController {
 
         for (String row : rows) {
             String[] columns = row.split("<\t>");
+
+            if(columns[0].equals("")){
+                return;
+            }
 
             int medical_record_id = Integer.parseInt(columns[0]);
             Location location = fetchLocation(Integer.parseInt(columns[1]));

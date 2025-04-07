@@ -14,7 +14,8 @@ public class Location implements DatabaseInterfaceable{
 	public Location(String name, String address){
 		this.name = name;
 		this.address = address;
-		this.id = counter++;
+		counter++;
+		this.id = counter;
 	}
 
 	public Location(int id, String name, String address) throws IllegalArgumentException {
@@ -148,8 +149,8 @@ public class Location implements DatabaseInterfaceable{
 
 	public void addEntry() throws SQLException {
 		String query = "INSERT INTO Location (location_id, name, address) VALUES (?, ?, ?)";
-		String[] values = {name, address};
-		String[] types = {"string", "string"};
+		String[] values = {String.valueOf(id), name, address};
+		String[] types = {"int", "string", "string"};
 		DbConnector db = DbConnector.getInstance();
 		db.deadEndQuery(query, values, types);
 	}

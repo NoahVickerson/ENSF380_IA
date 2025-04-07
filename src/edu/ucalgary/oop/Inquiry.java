@@ -62,7 +62,10 @@ public class Inquiry implements DatabaseInterfaceable {
         return inquirer;
     }
 
-    public void setInquirer(Person inquirer) {
+    public void setInquirer(Person inquirer) throws IllegalArgumentException {
+        if(missingPerson == inquirer){
+            throw new IllegalArgumentException("Inquirer and missing person cannot be the same");
+        }
         this.inquirer = inquirer;
     }
 
