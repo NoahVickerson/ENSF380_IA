@@ -486,7 +486,7 @@ public class ReliefController {
      * @param date date of inquiry
      * @return inquiry if found, null otherwise
      */
-    public Inquiry fetchInquiry(Person inquirer, DisasterVictim victim, String date) {
+    public Inquiry fetchInquiry(Person inquirer, Occupant victim, String date) {
         for (Inquiry i : inquiries) {
             if (i.getInquirer().equals(inquirer) && i.getMissingPerson().equals(victim) && i.getDateOfInquiry().equals(date)) {
                 return i;

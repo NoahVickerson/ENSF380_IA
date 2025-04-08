@@ -12,8 +12,8 @@ import java.sql.*;
 public class Inquiry implements DatabaseInterfaceable {
 
     private Person inquirer;
-    private DisasterVictim missingPerson;
-    private Location lastKnownLocation;
+    private Occupant missingPerson;
+    private OccupantHolder lastKnownLocation;
     private String infoProvided;
     private final String dateOfInquiry;
     private final int id;
@@ -28,7 +28,7 @@ public class Inquiry implements DatabaseInterfaceable {
      * @param lastKnownLocation
      * @throws IllegalArgumentException if inquirer and missing person different, or invalid date
      */
-    public Inquiry(Person inquirer, DisasterVictim missingPerson, String dateOfInquiry, String infoProvided, Location lastKnownLocation) throws IllegalArgumentException {
+    public Inquiry(Person inquirer, Occupant missingPerson, String dateOfInquiry, String infoProvided, OccupantHolder lastKnownLocation) throws IllegalArgumentException {
         if(inquirer == missingPerson){
             throw new IllegalArgumentException("inq_is_person");
         }
@@ -56,7 +56,7 @@ public class Inquiry implements DatabaseInterfaceable {
      * @param lastKnownLocation
      * @throws IllegalArgumentException if inquirer and missing person different, or invalid date
      */
-    public Inquiry(int id, Person inquirer, DisasterVictim missingPerson, String dateOfInquiry, String infoProvided, Location lastKnownLocation) throws IllegalArgumentException {
+    public Inquiry(int id, Person inquirer, Occupant missingPerson, String dateOfInquiry, String infoProvided, OccupantHolder lastKnownLocation) throws IllegalArgumentException {
         if(id < counter){
 			throw new IllegalArgumentException("repeat_id");
 		}
@@ -112,7 +112,7 @@ public class Inquiry implements DatabaseInterfaceable {
      * Returns the missing person
      * @return
      */
-    public DisasterVictim getMissingPerson() {
+    public Occupant getMissingPerson() {
         return missingPerson;
     }
 
@@ -144,7 +144,7 @@ public class Inquiry implements DatabaseInterfaceable {
      * gets the last known location
      * @return
      */
-    public Location getLastKnownLocation() {
+    public OccupantHolder getLastKnownLocation() {
         return lastKnownLocation;
     }
 
@@ -152,7 +152,7 @@ public class Inquiry implements DatabaseInterfaceable {
      * sets the last known location
      * @param lastKnownLocation
      */
-    public void setLastKnownLocation(Location lastKnownLocation) {
+    public void setLastKnownLocation(OccupantHolder lastKnownLocation) {
         this.lastKnownLocation = lastKnownLocation;
     }
 

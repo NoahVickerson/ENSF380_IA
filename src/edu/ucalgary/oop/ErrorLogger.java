@@ -31,7 +31,6 @@ public class ErrorLogger {
             logFile = new RandomAccessFile(fileName, "rw");
             logFile.seek(logFile.length());
             logFile.writeChars((new Date()).toString() + ": " + e.toString() + "\n\n");
-            e.printStackTrace();
         }
         catch (Exception ex) {
             ex.printStackTrace();

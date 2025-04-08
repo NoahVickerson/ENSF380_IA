@@ -350,7 +350,7 @@ public class Person implements DatabaseInterfaceable {
         }
 
         gender = gender.toLowerCase();
-        if (gender.equals("male") || gender.equals("female") || gender.equals("non_binary") || gender.equalsIgnoreCase("null")) {
+        if (gender.equals("male") || gender.equals("female") || gender.equals("non_binary") || gender.equalsIgnoreCase("null") || gender.equals("woman") || gender.equals("man")) {
             return true;
         }
         return false;
