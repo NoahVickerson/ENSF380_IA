@@ -877,6 +877,9 @@ public class UserInterface extends JFrame {
         }
         personPanel.add(locationInput);
 
+        JButton updatePerson = new JButton(validator.translateToLanguage("update") + " " + validator.translateToLanguage("person"));
+        personPanel.add(updatePerson);
+
         // allow adding medical records
         personPanel.add(new JLabel(validator.translateToLanguage("hr")));
         personPanel.add(new JLabel(validator.translateToLanguage("medical")));
@@ -924,8 +927,8 @@ public class UserInterface extends JFrame {
 
 
         // allow adding supplies
-        if(person.getCurrentLocation() != null) {
-            Posession[] locationSupplies = person.getCurrentLocation().getSupplies();
+        if(person.getCurrentLocation() != null && (person.getCurrentLocation() instanceof SupplyHolder)) {
+            Posession[] locationSupplies = ((SupplyHolder)person.getCurrentLocation()).getSupplies();
             personPanel.add(new JLabel(validator.translateToLanguage("hr")));
             personPanel.add(new JLabel(validator.translateToLanguage("supplies")));
 
@@ -961,9 +964,6 @@ public class UserInterface extends JFrame {
             }   
         }
         
-
-        JButton updatePerson = new JButton(validator.translateToLanguage("update") + " " + validator.translateToLanguage("person"));
-
         updatePerson.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -985,7 +985,6 @@ public class UserInterface extends JFrame {
                 }
             }
         });
-        personPanel.add(updatePerson);
 
         return personPanel;
     }
@@ -1327,8 +1326,8 @@ public class UserInterface extends JFrame {
                 }
                 
 
-                if(person.getCurrentLocation() != null){
-                    Location location = person.getCurrentLocation();
+                if(person.getCurrentLocation() != null && person.getCurrentLocation() instanceof Location){
+                    Location location = (Location) person.getCurrentLocation();
                     personPanels[i].add(new JLabel(validator.translateToLanguage("hr")));
                     personPanels[i].add(new JLabel(validator.translateToLanguage("location")));
                     personPanels[i].add(new JLabel(validator.translateToLanguage("hr")));
