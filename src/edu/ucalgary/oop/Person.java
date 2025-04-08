@@ -1,3 +1,10 @@
+/**
+ * @author Noah Vickerson
+ * Person.java 
+ * @version 1.1
+ * @date Apr 1 2025
+ */
+
 package edu.ucalgary.oop;
 
 import java.sql.*;
@@ -15,12 +22,25 @@ public class Person implements DatabaseInterfaceable {
     protected final int id;
     protected static int counter = 0;
 
+    /**
+     * Constructor
+     * @param firstName
+     * @param lastName
+     * @param birthDate must be in the format YYYY-MM-DD
+     * @param gender must be male, female, or non-binary
+     * @param phoneNum must be in the format XXX-XXX-XXXX or XXX-XXXX
+     * @param type must be either inquirer or disastervictim
+     * @throws IllegalArgumentException if above not followed
+     */
     public Person(String firstName, String lastName, String birthDate, String gender, String phoneNum, String type) throws IllegalArgumentException {
         if (!isValidDateFormat(birthDate)) {
-            throw new IllegalArgumentException("Invalid date format: " + birthDate);
+            throw new IllegalArgumentException("inv_date");
         }
         if(!isValidPhoneNum(phoneNum)){
-            throw new IllegalArgumentException("Invalid phone number format: " + phoneNum);
+            throw new IllegalArgumentException("inv_phone");
+        }
+        if(!isValidGender(gender)){
+            throw new IllegalArgumentException("inv_gender");
         }
 
         this.firstName = firstName;
@@ -34,12 +54,24 @@ public class Person implements DatabaseInterfaceable {
         this.id = counter;
     }
 
+    /**
+     * Constructor without type parameter
+     * @param firstName
+     * @param lastName
+     * @param birthDate must be in the format YYYY-MM-DD
+     * @param gender must be male, female, or non-binary
+     * @param phoneNum must be in the format XXX-XXX-XXXX or XXX-XXXX
+     * @throws IllegalArgumentException if above not followed
+     */
     public Person(String firstName, String lastName, String birthDate, String gender, String phoneNum) throws IllegalArgumentException {
         if (!isValidDateFormat(birthDate)) {
-            throw new IllegalArgumentException("Invalid date format: " + birthDate);
+            throw new IllegalArgumentException("inv_date");
         }
         if(!isValidPhoneNum(phoneNum)){
-            throw new IllegalArgumentException("Invalid phone number format: " + phoneNum);
+            throw new IllegalArgumentException("inv_phone");
+        }
+        if(!isValidGender(gender)){
+            throw new IllegalArgumentException("inv_gender");
         }
 
         this.firstName = firstName;
@@ -53,13 +85,30 @@ public class Person implements DatabaseInterfaceable {
         this.id = counter;
     }
 
+    /**
+     * Constructor with id
+     * @param id        must be unique
+     * @param firstName
+     * @param lastName
+     * @param birthDate must be in the format YYYY-MM-DD
+     * @param gender must be male, female, or non-binary
+     * @param phoneNum must be in the format XXX-XXX-XXXX or XXX-XXXX
+     * @param type must be either inquirer or disastervictim
+     * @throws IllegalArgumentException if above not followed
+     */
     public Person(int id, String firstName, String lastName, String birthDate, String gender, String phoneNum, String type) throws IllegalArgumentException {
         if(id < counter){
-			throw new IllegalArgumentException("id may not be unique");
+			throw new IllegalArgumentException("repeat_id");
 		}
         
         if (!isValidDateFormat(birthDate)) {
-            throw new IllegalArgumentException("Invalid date format: " + birthDate);
+            throw new IllegalArgumentException("inv_date");
+        }
+        if(!isValidPhoneNum(phoneNum)){
+            throw new IllegalArgumentException("inv_phone");
+        }
+        if(!isValidGender(gender)){
+            throw new IllegalArgumentException("inv_gender");
         }
 
         this.firstName = firstName;
@@ -75,13 +124,29 @@ public class Person implements DatabaseInterfaceable {
         }
     }
 
+    /**
+     * Constructor without type parameter with id
+     * @param id        must be unique
+     * @param firstName
+     * @param lastName
+     * @param birthDate must be in the format YYYY-MM-DD
+     * @param gender must be male, female, or non-binary
+     * @param phoneNum must be in the format XXX-XXX-XXXX or XXX-XXXX
+     * @throws IllegalArgumentException if above not followed
+     */
     public Person(int id, String firstName, String lastName, String birthDate, String gender, String phoneNum) throws IllegalArgumentException {
         if(id < counter){
-			throw new IllegalArgumentException("id may not be unique");
+			throw new IllegalArgumentException("repeat_id");
 		}
         
         if (!isValidDateFormat(birthDate)) {
-            throw new IllegalArgumentException("Invalid date format: " + birthDate);
+            throw new IllegalArgumentException("inv_date");
+        }
+        if(!isValidPhoneNum(phoneNum)){
+            throw new IllegalArgumentException("inv_phone");
+        }
+        if(!isValidGender(gender)){
+            throw new IllegalArgumentException("inv_gender");
         }
 
         this.firstName = firstName;
@@ -97,65 +162,125 @@ public class Person implements DatabaseInterfaceable {
         }
     }
 
+    /**
+     * Returns the first name
+     * @return first name
+     */
     public String getFirstName() {
         return firstName;
     }
 
+    /**
+     * Sets the first name
+     * @param firstName
+     */
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
+    /**
+     * Returns the last name
+     * @return last name
+     */
     public String getLastName() {
         return lastName;
     }
 
+    /**
+     * Sets the last name
+     * @param lastName
+     */
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
+    /**
+     * Sets the comments
+     * @param comments
+     */
     public void setComments(String comments) {
         this.comments = comments;
     }
 
+    /**
+     * Returns the comments
+     * @return comments
+     */
     public String getComments() {
         return comments;
     }
 
+    /**
+     * Returns the date of birth
+     * @return date of birth
+     */
     public String getDateOfBirth() {
         return birthDate;
     }
 
+    /**
+     * Sets the date of birth
+     * @param birthDate must be in the format YYYY-MM-DD
+     * @throws IllegalArgumentException if above not followed
+     */
     public void setDateOfBirth(String birthDate) throws IllegalArgumentException {
         if (!isValidDateFormat(birthDate)) {
-            throw new IllegalArgumentException("Invalid date format: " + birthDate);
+            throw new IllegalArgumentException("inv_date");
         }
         this.birthDate = birthDate;
     }
 
+    /**
+     * Returns the type
+     * @return type
+     */
     public String getType() {
         return TYPE;
     }
 
+    /**
+     * Returns the gender
+     * @return gender
+     */
     public String getGender() {
         return gender;
     }
 
+    /**
+     * Sets the gender
+     * @param gender must be male, female, or non-binary
+     * @throws IllegalArgumentException if above not followed
+     */
     public void setGender(String gender) throws IllegalArgumentException {
         if (!isValidGender(gender)) {
-            throw new IllegalArgumentException("Invalid gender: " + gender);
+            throw new IllegalArgumentException("inv_gender");
         }
         this.gender = gender;
     }
 
+    /**
+     * Returns the phone number
+     * @return phone number
+     */
     public String getPhoneNumber() {
         return phoneNum;
     }
 
+    /**
+     * Sets the phone number
+     * @param phoneNum must be in the format XXX-XXX-XXXX or XXX-XXXX
+     * @throws IllegalArgumentException if above not followed
+     */
     public void setPhoneNumber(String phoneNum) throws IllegalArgumentException {
 
         this.phoneNum = phoneNum;
     }
 
+    /**
+     * Adds a family member
+     * @param familyMember
+     * @throws IllegalArgumentException if family member already has a family group
+     */
     public void addFamilyMember(Person familyMember) throws IllegalArgumentException {
         if (familyGroup == null) {
             if (familyMember.getFamilyGroup() != null) {
@@ -170,10 +295,18 @@ public class Person implements DatabaseInterfaceable {
 
     }
 
+    /**
+     * Returns the family group
+     * @return family group
+     */
     public FamilyGroup getFamilyGroup() {
         return familyGroup;
     }
 
+    /**
+     * Sets the family group
+     * @param familyGroup
+     */
     public void setFamilyGroup(FamilyGroup familyGroup) {
         if(this.familyGroup == familyGroup) {
             return;
@@ -190,6 +323,11 @@ public class Person implements DatabaseInterfaceable {
         familyGroup.addFamilyMember(this);
     }
 
+    /**
+     * Checks if the date is in the format YYYY-MM-DD
+     * @param date
+     * @return true if valid
+     */
     protected static boolean isValidDateFormat(String date) {
         if(date == null) {
             return true;
@@ -198,6 +336,11 @@ public class Person implements DatabaseInterfaceable {
         return date.matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}$") || date.equalsIgnoreCase("null");
     }
 
+    /**
+     * Checks if the gender is valid
+     * @param gender
+     * @return true if valid
+     */
     private static boolean isValidGender(String gender) {
         if(gender == null) {
             return true;
@@ -210,6 +353,11 @@ public class Person implements DatabaseInterfaceable {
         return false;
     }
 
+    /**
+     * Checks if the phone number is valid
+     * @param phoneNum
+     * @return true if valid
+     */
     private static boolean isValidPhoneNum(String phoneNum) {
         if(phoneNum == null) {
             return true;
@@ -218,10 +366,18 @@ public class Person implements DatabaseInterfaceable {
         return phoneNum.matches("^[0-9]{3}-[0-9]{3}-[0-9]{4}$") || phoneNum.equalsIgnoreCase("null") || phoneNum.matches("^[0-9]{3}-[0-9]{4}$");
     }
 
+    /**
+     * Returns the id
+     * @return id
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Adds an entry to the database
+     * @throws SQLException
+     */
     public void addEntry() throws SQLException {
         if(this.familyGroup == null) {
             String query = "INSERT INTO Person (first_name, last_name, date_of_birth, gender, comments, phone_number, family_group) VALUES (?, ?, ?, ?, ?, ?, NULL)";
@@ -238,6 +394,10 @@ public class Person implements DatabaseInterfaceable {
         }
     }
 
+    /**
+     * Updates an entry in the database
+     * @throws SQLException
+     */
     public void updateEntry() throws SQLException {
         if (this.familyGroup == null) {
             String query = "UPDATE Person SET first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, comments = ?, phone_number = ?, family_group = NULL WHERE person_id = ?";

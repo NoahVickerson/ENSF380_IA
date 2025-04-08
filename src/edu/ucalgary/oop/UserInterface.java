@@ -35,7 +35,7 @@ public class UserInterface extends JFrame {
             }
 
             try {
-                controller = ReliefController.getInstance(uname, pword);
+                controller = ReliefController.getInstance(uname, pword, validator);
             }catch (IllegalArgumentException e) {
                 e.printStackTrace();
                 displayError(validator.translateToLanguage("upass_incorrect") + "\n" + e.getMessage());
@@ -352,7 +352,7 @@ public class UserInterface extends JFrame {
                     controller.fetchInquiry(inquirer, victim, dateOfInquiry).addEntry();
                     displayError(validator.translateToLanguage("create_inquiry_success"));
                 } catch (IllegalArgumentException e1) {
-                    displayError(validator.translateToLanguage("create_inquiry_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                    displayError(validator.translateToLanguage("create_inquiry_err") +validator.translateToLanguage(e1.getMessage()) + "\n" + validator.translateToLanguage("try_again"));
                 } catch (SQLException e1) {
                     logger.logError(e1);
                     exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
@@ -460,7 +460,7 @@ public class UserInterface extends JFrame {
                             try {
                                 location = new Location(newLocationName.toString(), newLocationAddress.toString());
                             }catch(IllegalArgumentException e1){
-                                displayError(validator.translateToLanguage("create_location_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                                displayError(validator.translateToLanguage("create_location_err") + validator.translateToLanguage(e1.getMessage()) + "\n" + validator.translateToLanguage("try_again"));
                                 return;
                             }
                             controller.addLocation(location);
@@ -477,7 +477,7 @@ public class UserInterface extends JFrame {
                     person.addEntry();
                     displayError(validator.translateToLanguage("person_created"));
                 } catch (IllegalArgumentException e1) {
-                    displayError(validator.translateToLanguage("create_person_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                    displayError(validator.translateToLanguage("create_person_err") + validator.translateToLanguage(e1.getMessage()) + "\n" + validator.translateToLanguage("try_again"));
                 } catch (SQLException e1) {
                     logger.logError(e1);
                     exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
@@ -565,7 +565,7 @@ public class UserInterface extends JFrame {
                     medicalRecord.addEntry();
                 } catch (IllegalArgumentException e1) {
                     e1.printStackTrace();
-                    displayError(validator.translateToLanguage("update_medical_record_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                    displayError(validator.translateToLanguage("update_medical_record_err") + validator.translateToLanguage(e1.getMessage()) + "\n" + validator.translateToLanguage("try_again"));
                 } catch (SQLException e1) {
                     logger.logError(e1);
                     exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
@@ -665,14 +665,10 @@ public class UserInterface extends JFrame {
 
         String[] supplyHolders = new String[controller.getPeople().length + controller.getLocations().length];
         ArrayList<String> supplyHolderNames = new ArrayList<String>();
-        DisasterVictim[] validPersons = new DisasterVictim[controller.getPeople().length];
-        for (int i = 0; i < controller.getPeople().length; i++) {
-            if(!(controller.getPeople()[i] instanceof DisasterVictim)){
-                continue;
-            }
+        DisasterVictim[] validPersons = controller.getVictims();
+        for (int i = 0; i < validPersons.length; i++) {
             supplyHolders[i] = controller.getPeople()[i].getFirstName() + " " + controller.getPeople()[i].getLastName();   
             supplyHolderNames.add(controller.getPeople()[i].getFirstName() + " " + controller.getPeople()[i].getLastName());
-            validPersons[i] = (DisasterVictim) controller.getPeople()[i];
         }
         for (int i = 0; i < controller.getLocations().length; i++) {
             supplyHolders[i + controller.getPeople().length] = controller.getLocations()[i].getName();
@@ -688,39 +684,32 @@ public class UserInterface extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String type = (String) typeInput.getSelectedItem();
-                String supplyHolder = (String) supplyHolderInput.getSelectedItem();
+                String supplyHolderString = (String) supplyHolderInput.getSelectedItem();
                 int quantity = 0;
                 String comments = "";
-                DisasterVictim supplyHolderPerson = null;
-                Location supplyHolderLocation = null;
+                SupplyHolder supplyHolder = null;
 
-                if(supplyHolderNames.indexOf(supplyHolder) < controller.getPeople().length){
-                    supplyHolderPerson = validPersons[supplyHolderNames.indexOf(supplyHolder)];
+                if(supplyHolderNames.indexOf(supplyHolderString) < validPersons.length){
+                    supplyHolder = validPersons[supplyHolderNames.indexOf(supplyHolderString)];
                 }else {
-                    supplyHolderLocation = controller.getLocations()[supplyHolderNames.indexOf(supplyHolder) - controller.getPeople().length];
+                    supplyHolder = controller.getLocations()[supplyHolderNames.indexOf(supplyHolderString) - controller.getPeople().length];
                 }
                 try {
                     if (type.equals(types[0])) {
                         if(!validator.isValidQuantity(quantityInputWater.getText())) {
-                            throw new IllegalArgumentException(validator.translateToLanguage("inv_quantity") + quantityInputWater.getText());
+                            throw new IllegalArgumentException("inv_quantity");
                         }
                         quantity = Integer.parseInt(quantityInputWater.getText());
                         comments = commentsInputWater.getText();
 
                         Water water = new Water(comments, quantity);
 
-                        if(supplyHolderPerson != null) {
-                            supplyHolderPerson.addSupply(water);
-                            water.addEntry();
-                            supplyHolderPerson.updateEntry();
-                        } else {
-                            supplyHolderLocation.addSupply(water);
-                            water.addEntry();
-                            supplyHolderLocation.updateEntry();
-                        }
+                        supplyHolder.addSupply(water);
+                        water.addEntry();
+                        supplyHolder.updateEntry();
                     } else if (type.equals(types[1])) {
                         if(!validator.isValidQuantity(quantityInputWater.getText())) {
-                            throw new IllegalArgumentException(validator.translateToLanguage("inv_quantity") + quantityInputBlanket.getText());
+                            throw new IllegalArgumentException("inv_quantity");
                         }
                         quantity = Integer.parseInt(quantityInputBlanket.getText());
                         comments = commentsInputBlanket.getText();
@@ -729,15 +718,9 @@ public class UserInterface extends JFrame {
 
                         blanket.setComments(comments);
 
-                        if(supplyHolderPerson != null) {
-                            supplyHolderPerson.addSupply(blanket);
-                            blanket.addEntry();
-                            supplyHolderPerson.updateEntry();
-                        } else {
-                            supplyHolderLocation.addSupply(blanket);
-                            blanket.addEntry();
-                            supplyHolderLocation.updateEntry();
-                        }
+                        supplyHolder.addSupply(blanket);
+                        blanket.addEntry();
+                        supplyHolder.updateEntry();
                     } else if (type.equals(types[2])) {
                         String room = roomInput.getText();
                         String grid = gridInput.getText();
@@ -748,15 +731,9 @@ public class UserInterface extends JFrame {
 
                         Cot cot = new Cot(room, grid, room + grid);
 
-                        if(supplyHolderPerson != null) {
-                            supplyHolderPerson.addSupply(cot);
-                            cot.addEntry();
-                            supplyHolderPerson.updateEntry();
-                        } else {
-                            supplyHolderLocation.addSupply(cot);
-                            cot.addEntry();
-                            supplyHolderLocation.updateEntry();
-                        }
+                        supplyHolder.addSupply(cot);
+                        cot.addEntry();
+                        supplyHolder.updateEntry();
                     } else if (type.equals(types[3])) {
                         if(!validator.isValidQuantity(quantityInput.getText())) {
                             throw new IllegalArgumentException("inv_quantity");
@@ -767,17 +744,17 @@ public class UserInterface extends JFrame {
 
                         PersonalBelonging belonging = new PersonalBelonging(desc, comments, quantity);
 
-                        if(supplyHolderPerson != null) {
-                            supplyHolderPerson.addSupply(belonging);
-                            belonging.addEntry();
-                            supplyHolderPerson.updateEntry();
-                        } else {
+                        if(!(supplyHolder instanceof DisasterVictim)) {
                             throw new IllegalArgumentException("pb_only_person");
+                        }else{
+                            supplyHolder.addSupply(belonging);
+                            belonging.addEntry();
+                            supplyHolder.updateEntry();
                         }
                     }
                     displayError(validator.translateToLanguage("create_supply_success"));
                 }catch (IllegalArgumentException e1) {
-                    displayError(validator.translateToLanguage("create_supply_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                    displayError(validator.translateToLanguage("create_supply_err") + validator.translateToLanguage(e1.getMessage()) + "\n" + validator.translateToLanguage("try_again"));
                 } catch (SQLException e1) {
                     logger.logError(e1);
                     exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
@@ -878,7 +855,7 @@ public class UserInterface extends JFrame {
                     displayError(validator.translateToLanguage("add_family_success"));
                 } catch (IllegalArgumentException e1) {
                     e1.printStackTrace();
-                    displayError(validator.translateToLanguage("add_family_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                    displayError(validator.translateToLanguage("add_family_err") + validator.translateToLanguage(e1.getMessage()) + "\n" + validator.translateToLanguage("try_again"));
                 } catch (SQLException e1) {
                     logger.logError(e1);
                     exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
@@ -948,39 +925,43 @@ public class UserInterface extends JFrame {
 
 
         // allow adding supplies
-        Supply[] locationSupplies = person.getCurrentLocation().getSupplies();
-        personPanel.add(new JLabel(validator.translateToLanguage("hr")));
-        personPanel.add(new JLabel(validator.translateToLanguage("supplies")));
+        if(person.getCurrentLocation() != null) {
+            Supply[] locationSupplies = person.getCurrentLocation().getSupplies();
+            personPanel.add(new JLabel(validator.translateToLanguage("hr")));
+            personPanel.add(new JLabel(validator.translateToLanguage("supplies")));
 
-        if(locationSupplies != null) {
+            if(locationSupplies != null) {
 
-            ArrayList<String> supplyNames = new ArrayList<>();
+                ArrayList<String> supplyNames = new ArrayList<>();
 
-            for (int i = 0; i < locationSupplies.length; i++) {
-                supplyNames.add(locationSupplies[i].getType() + " (" + locationSupplies[i].getId() + ")");
-            }
-
-            JComboBox supplyInput = new JComboBox(supplyNames.toArray());
-
-            JButton addSupply = new JButton(validator.translateToLanguage("add_supply"));
-
-            personPanel.add(supplyInput);
-            personPanel.add(addSupply);
-            addSupply.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        controller.reflectSupplyTransfer(person, locationSupplies[supplyInput.getSelectedIndex()]);
-                        displayError(validator.translateToLanguage("supply_transfer_success"));
-                    } catch (IllegalArgumentException e1) {
-                        displayError(validator.translateToLanguage("supply_transfer_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
-                    } catch (SQLException e1) {
-                        logger.logError(e1);
-                        exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
-                    }
+                for (int i = 0; i < locationSupplies.length; i++) {
+                    supplyNames.add(locationSupplies[i].getType() + " (" + locationSupplies[i].getId() + ")");
                 }
-            });
-        }   
+
+                JComboBox supplyInput = new JComboBox(supplyNames.toArray());
+
+                JButton addSupply = new JButton(validator.translateToLanguage("add_supply"));
+
+                personPanel.add(supplyInput);
+                personPanel.add(addSupply);
+                addSupply.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            controller.reflectSupplyTransfer(person, locationSupplies[supplyInput.getSelectedIndex()]);
+                            person.updateEntry();
+                            displayError(validator.translateToLanguage("supply_transfer_success"));
+                        } catch (IllegalArgumentException e1) {
+                            displayError(validator.translateToLanguage("supply_transfer_err") + validator.translateToLanguage(e1.getMessage()) + "\n" + validator.translateToLanguage("try_again"));
+                        } catch (SQLException e1) {
+                            logger.logError(e1);
+                            exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
+                        }
+                    }
+                });
+            }   
+        }
+        
 
         JButton updatePerson = new JButton(validator.translateToLanguage("update") + " " + validator.translateToLanguage("person"));
 
@@ -998,7 +979,7 @@ public class UserInterface extends JFrame {
                     person.updateEntry();
                     displayError(validator.translateToLanguage("update_person_success"));
                 } catch (IllegalArgumentException e1) {
-                    displayError(validator.translateToLanguage("update_person_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                    displayError(validator.translateToLanguage("update_person_err") + validator.translateToLanguage(e1.getMessage()) + "\n" + validator.translateToLanguage("try_again"));
                 } catch (SQLException e1) {
                     logger.logError(e1);
                     exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
@@ -1035,7 +1016,7 @@ public class UserInterface extends JFrame {
                     location.updateEntry();
                     displayError(validator.translateToLanguage("update_location_success"));
                 } catch (IllegalArgumentException e1) {
-                    displayError(validator.translateToLanguage("update_location_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                    displayError(validator.translateToLanguage("update_location_err") + validator.translateToLanguage(e1.getMessage()) + "\n" + validator.translateToLanguage("try_again"));
                 } catch (SQLException e1) {
                     logger.logError(e1);
                     exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
@@ -1151,7 +1132,7 @@ public class UserInterface extends JFrame {
                     inquiry.updateEntry();
                     displayError(validator.translateToLanguage("update_inquiry_success"));
                 } catch (IllegalArgumentException e1) {
-                    displayError(validator.translateToLanguage("update_inquiry_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                    displayError(validator.translateToLanguage("update_inquiry_err") + validator.translateToLanguage(e1.getMessage()) + "\n" + validator.translateToLanguage("try_again"));
                 } catch (SQLException e1) {
                     logger.logError(e1);
                     exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);
@@ -1208,7 +1189,7 @@ public class UserInterface extends JFrame {
                     medicalRecord.updateEntry();
                     displayError(validator.translateToLanguage("update_medical_record_success"));
                 } catch (IllegalArgumentException e1) {
-                    displayError(validator.translateToLanguage("update_medical_record_err") + e1.getMessage() + "\n" + validator.translateToLanguage("try_again"));
+                    displayError(validator.translateToLanguage("update_medical_record_err") + validator.translateToLanguage(e1.getMessage()) + "\n" + validator.translateToLanguage("try_again"));
                 } catch (SQLException e1) {
                     logger.logError(e1);
                     exit(validator.translateToLanguage("db_err") + "\n" + e1.getMessage(), 1);

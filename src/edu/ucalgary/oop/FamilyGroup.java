@@ -1,3 +1,10 @@
+/**
+ * @author Noah Vickerson
+ * FamilyGroup.java 
+ * @version 1.1
+ * @date Apr 1 2025
+ */
+
 package edu.ucalgary.oop;
 
 import java.util.Arrays;
@@ -7,15 +14,24 @@ public class FamilyGroup {
     private final int id;
     private static int counter = 0;
 
+    /**
+     * Default constructor
+     */
     public FamilyGroup() {
         familyMembers = new Person[] {};
         counter++;
         id = counter;
     }
 
+    /**
+     * Constructor creates a new group with two people
+     * @param person1
+     * @param person2
+     * @throws IllegalArgumentException if persons are the same
+     */
     public FamilyGroup(Person person1, Person person2) throws IllegalArgumentException {
         if (person1 == person2) {
-            throw new IllegalArgumentException("Persons cannot be the same");
+            throw new IllegalArgumentException("same_person");
         }
         familyMembers = new Person[] {person1, person2};
         person1.setFamilyGroup(this);
@@ -24,9 +40,14 @@ public class FamilyGroup {
         id = counter;
     }
 
+    /**
+     * Constructor creates a new group with a specific id (for constructiion from db)
+     * @param person1
+     * @throws IllegalArgumentException if id already in use
+     */
     public FamilyGroup(int id) throws IllegalArgumentException {
         if (id < counter) {
-            throw new IllegalArgumentException("ID is already in use");
+            throw new IllegalArgumentException("repeat_id");
         }
         familyMembers = new Person[] {};
         this.id = id;
@@ -35,12 +56,18 @@ public class FamilyGroup {
         }
     }
 
+    /**
+     * Constructor creates a new group with a specific id (for constructiion from db)
+     * @param person1
+     * @param person2
+     * @throws IllegalArgumentException if id already in use or people the same
+     */
     public FamilyGroup(int id, Person person1, Person person2) throws IllegalArgumentException {
         if (id < counter) {
-            throw new IllegalArgumentException("ID is already in use");
+            throw new IllegalArgumentException("repeat_id");
         }
         if (person1 == person2) {
-            throw new IllegalArgumentException("Persons cannot be the same");
+            throw new IllegalArgumentException("same_person");
         }
         familyMembers = new Person[] {person1, person2};
         person1.setFamilyGroup(this);
@@ -51,10 +78,19 @@ public class FamilyGroup {
         }
     }
 
+    /**
+     * Returns the id
+     * @return id
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Adds a person to the family group
+     * @param familyMember
+     * @throws IllegalArgumentException if person already has a family group
+     */
     public void addFamilyMember(Person familyMember) throws IllegalArgumentException {
         if(familyMember.getFamilyGroup() == this) {
             for(Person person : familyMembers) {
@@ -64,21 +100,33 @@ public class FamilyGroup {
             }
         }
         else if (familyMember.getFamilyGroup() != null) {
-            throw new IllegalArgumentException("Person already has a family group");
+            throw new IllegalArgumentException("person_in_family");
         }
         familyMembers = Arrays.copyOf(familyMembers, familyMembers.length + 1);
         familyMembers[familyMembers.length - 1] = familyMember;
         familyMember.setFamilyGroup(this);
     }
 
+    /**
+     * Sets the family members
+     * @param familyMembers
+     */
     public void setFamilyMembers(Person[] familyMembers) {
         this.familyMembers = familyMembers;
     }
 
+    /**
+     * Returns the family members
+     * @return familyMembers
+     */
     public Person[] getFamilyMembers() {
         return familyMembers;
     }
 
+    /**
+     * Removes a person from the family group
+     * @param familyMember
+     */
     public void removeFamilyMember(Person familyMember) {
         if (familyMember.getFamilyGroup() != this) {
             return;

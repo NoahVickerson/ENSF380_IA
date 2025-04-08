@@ -1,3 +1,10 @@
+/**
+ * @author Noah Vickerson
+ * Main.java 
+ * @version 1.2
+ * @date Mar 30 2025
+ */
+
 package edu.ucalgary.oop;
 
 import java.util.Scanner;
@@ -7,6 +14,10 @@ import java.io.File;
 public class Main {
     private static final String[] languages = {"en-CA"};
 
+    /**
+     * Main entry point of program
+     * @param args
+     */
     public static void main(String[] args) {
         // select the proper language
         String language = "";

@@ -1,3 +1,10 @@
+/**
+ * @author Noah Vickerson
+ * ReliefController.java 
+ * @version 2.5
+ * @date Apr 7 2025
+ */
+
 package edu.ucalgary.oop;
 
 import java.sql.*;
@@ -15,12 +22,19 @@ public class ReliefController {
     private DatabaseQueryHandler fetcher;
     private TextInputValidator validator;
 
-    private ReliefController(String url, String username, String password) throws SQLException, IllegalArgumentException {
+    /**
+     * Constructor 
+     * @param url for database
+     * @param username for database
+     * @param password  for database
+     * @throws SQLException with database errors in loads or connections
+     * @throws IllegalArgumentException with database connection errors due to invalid uname or password
+     */
+    private ReliefController(String url, String username, String password, TextInputValidator validator) throws SQLException, IllegalArgumentException {
         LocalDate currentDate = LocalDate.now();
         String dateString = currentDate.toString(); // get current date for water
 
-        validator = TextInputValidator.getInstance();
-
+        this.validator = validator;
         try {
             fetcher = DbConnector.getInstance(url, username, password); // initialize database connection
         } catch (SQLException e) {
@@ -44,32 +58,61 @@ public class ReliefController {
         loadMedicalRecords();
     }
 
+    /**
+     * Default constructor without loading from database to test on test data
+     */
     private ReliefController() {
         // for testing without a database dependency
+
     }
 
-    public static ReliefController getInstance(String uname, String pword) throws IllegalArgumentException, SQLException {
+    /**
+     * Get singleton instance of ReliefController
+     * @param uname username for database
+     * @param pword password for database
+     * @return ReliefController
+     * @throws IllegalArgumentException with database connection errors due to invalid uname or password
+     * @throws SQLException with database errors in loads or connections
+     */
+    public static ReliefController getInstance(String uname, String pword, TextInputValidator validator) throws IllegalArgumentException, SQLException {
         if(controller == null) {
-            controller = new ReliefController("jdbc:postgresql://localhost/ensf380project", uname, pword);
+            controller = new ReliefController("jdbc:postgresql://localhost/ensf380project", uname, pword, validator);
         }
         return controller;
     }
 
-    public static ReliefController getInstance() {
+    /**
+     * Get singleton instance of ReliefController when already initialized
+     * @return ReliefController
+     * @throws IllegalStateException when ReliefController has not been initialized
+     */
+    public static ReliefController getInstance() throws IllegalStateException{
         if(controller == null) {
             controller = new ReliefController(); // for testing decoupled from the database
         }
         return controller;
     }
 
+    /**
+     * Get locations
+     * @return locations stored
+     */
     public Location[] getLocations() {
         return locations;
     }
 
+    /**
+     * Get people
+     * @return people stored
+     */
     public Person[] getPeople() {
         return people;
     }
 
+    /**
+     * Get victims
+     * @return people stored that are victims
+     */
     public DisasterVictim[] getVictims() {
         int numVictims = 0;
         for(int i = 0; i < people.length; i++) {
@@ -86,14 +129,32 @@ public class ReliefController {
         return tempVictims;
     }
 
+    /**
+     * Get inquiries
+     * @return inquiries stored
+     */
     public Inquiry[] getInquiries() {
         return inquiries;
     }
 
+    /**
+     * Get family groups
+     * @return family groups stored
+     */
     public FamilyGroup[] getFamilyGroups() {
         return familyGroups;
     }
 
+    /**
+     * Add disaster victim to people array
+     * @param firstName first name of person
+     * @param lastName last name of person
+     * @param dateOfBirth date of birth of person
+     * @param gender gender of person
+     * @param phoneNum phone number of person
+     * @param currentLocation current location of person
+     * @param entryDate entry date of person
+     */
     public void addDisasterVictim(String firstName, String lastName, String dateOfBirth, String gender, String phoneNum, Location currentLocation, String entryDate) {
         if(fetchPerson(firstName, lastName) != null) {
             return;
@@ -114,6 +175,10 @@ public class ReliefController {
 
     }
 
+    /**
+     * Add disaster victim to people array
+     * @param victim disaster victim to add
+     */
     public void addDisasterVictim(DisasterVictim victim) {
         if(fetchPerson(victim) != null) {
             return;
@@ -127,6 +192,10 @@ public class ReliefController {
         people = newPeople;
     }
 
+    /**
+     * Add family group to family groups array
+     * @param members members of family group
+     */
     public void addFamilyGroup(Person[] members) {
         FamilyGroup familyGroup = new FamilyGroup();
         familyGroup.setFamilyMembers(members);
@@ -139,6 +208,10 @@ public class ReliefController {
         familyGroups = newFamilyGroups;
     }
 
+    /**
+     * Add family group to family groups array
+     * @param familyGroup family group to add
+     */
     public void addFamilyGroup(FamilyGroup familyGroup) {
         FamilyGroup[] newFamilyGroups = new FamilyGroup[familyGroups.length + 1];
         for(int i = 0; i < familyGroups.length; i++) {
@@ -148,6 +221,14 @@ public class ReliefController {
         familyGroups = newFamilyGroups;
     }
 
+    /**
+     * Add inquiry to inquiries array
+     * @param inquirer inquirer of inquiry
+     * @param missingPerson missing person of inquiry
+     * @param dateOfInquiry date of inquiry
+     * @param description description of inquiry
+     * @param location location of inquiry
+     */
     public void addInquiry(Person inquirer, DisasterVictim missingPerson, String dateOfInquiry, String description, Location location) {
         if(fetchInquiry(inquirer, missingPerson, dateOfInquiry) != null) {
             return;
@@ -176,6 +257,10 @@ public class ReliefController {
 
     }
 
+    /**
+     * Add inquiry to inquiries array
+     * @param inquiry inquiry to add
+     */
     public void addInquiry(Inquiry inquiry) {
         if(fetchInquiry(inquiry) != null) {
             return;
@@ -189,6 +274,10 @@ public class ReliefController {
         inquiries = newInquiries;
     }
 
+    /**
+     * Add location to locations array
+     * @param location location to add
+     */
     public void addLocation(Location location) {
         if(fetchLocation(location) != null) {
             return;
@@ -202,6 +291,11 @@ public class ReliefController {
         locations = newLocations;
     }
 
+    /**
+     * Add location to locations array
+     * @param name name of location
+     * @param address address of location
+     */
     public void addLocation(String name, String address) {
         if(fetchLocation(name) != null) {
             return;
@@ -217,6 +311,14 @@ public class ReliefController {
         locations = newLocations;
     }
 
+    /**
+     * Add person to people array
+     * @param firstName first name of person
+     * @param lastName last name of person
+     * @param dateOfBirth date of birth of person
+     * @param gender gender of person
+     * @param phoneNum phone number of person
+     */
     public void addPerson(String firstName, String lastName, String dateOfBirth, String gender, String phoneNum) {
         if(fetchPerson(firstName, lastName) != null) {
             return;
@@ -232,6 +334,10 @@ public class ReliefController {
         people = newPeople;
     }
 
+    /**
+     * Add person to people array
+     * @param person person to add
+     */
     public void addPerson(Person person) {
         if(fetchPerson(person) != null) {
             return;
@@ -245,6 +351,11 @@ public class ReliefController {
         people = newPeople;
     }
 
+    /**
+     * Fetch person from people array
+     * @param person person to fetch
+     * @return null if not found, found otherwise
+     */
     public Person fetchPerson(Person person) {
         for (Person p : people) {
             if (p.equals(person)) {
@@ -254,6 +365,12 @@ public class ReliefController {
         return null;
     }
 
+    /**
+     * Fetch person from people array
+     * @param firstName first name of person
+     * @param lastName last name of person
+     * @return null if not found, found otherwise
+     */
     public Person fetchPerson(String firstName, String lastName) {
         for (Person p : people) {
             if (p.getFirstName().equals(firstName) && p.getLastName().equals(lastName)) {
@@ -263,6 +380,11 @@ public class ReliefController {
         return null;
     }
 
+    /**
+     * Fetch person from people array
+     * @param id id of person
+     * @return null if not found, found otherwise
+     */
     public Person fetchPerson(int id) {
         for (Person p : people) {
             if (p.getId() == id) {
@@ -272,6 +394,11 @@ public class ReliefController {
         return null;
     }
 
+    /**
+     * Fetch victim from people array
+     * @param id id of victim
+     * @return null if not found, found otherwise
+     */
     public DisasterVictim fetchVictim(int id) {
         for (Person p : people) {
             if (p.getId() == id && p instanceof DisasterVictim) {
@@ -281,6 +408,12 @@ public class ReliefController {
         return null;
     }
 
+    /**
+     * Fetch victim from people array
+     * @param firstName first name of victim
+     * @param lastName last name of victim
+     * @return null if not found, found otherwise
+     */
     public DisasterVictim fetchVictim(String firstName, String lastName) {
         for (Person p : people) {
             if (p.getFirstName().equals(firstName) && p.getLastName().equals(lastName) && p instanceof DisasterVictim) {
@@ -290,6 +423,11 @@ public class ReliefController {
         return null;
     }
 
+    /**
+     * Fetch location from locations array
+     * @param location location to fetch
+     * @return location if found, null otherwise
+     */
     public Location fetchLocation(Location location) {
         for (Location l : locations) {
             if (l.equals(location)) {
@@ -299,6 +437,11 @@ public class ReliefController {
         return null;
     }
 
+    /**
+     * Fetch location from locations array
+     * @param name name of location
+     * @return location if found, null otherwise
+     */
     public Location fetchLocation(String name) {
         for (Location l : locations) {
             if (l.getName().equals(name)) {
@@ -308,6 +451,11 @@ public class ReliefController {
         return null;
     }
 
+    /**
+     * Fetch location from locations array
+     * @param id id of location
+     * @return location if found, null otherwise
+     */
     public Location fetchLocation(int id) {
         for (Location l : locations) {
             if (l.getId() == id) {
@@ -317,6 +465,11 @@ public class ReliefController {
         return null;
     }
 
+    /**
+     * Fetch inquiry from inquiries array
+     * @param inquiry inquiry to fetch
+     * @return inquiry if found, null otherwise
+     */
     public Inquiry fetchInquiry(Inquiry inquiry) {
         for (Inquiry i : inquiries) {
             if (i.equals(inquiry)) {
@@ -326,6 +479,13 @@ public class ReliefController {
         return null;
     }
 
+    /**
+     * Fetch inquiry from inquiries array
+     * @param inquirer inquirer of inquiry
+     * @param victim victim of inquiry
+     * @param date date of inquiry
+     * @return inquiry if found, null otherwise
+     */
     public Inquiry fetchInquiry(Person inquirer, DisasterVictim victim, String date) {
         for (Inquiry i : inquiries) {
             if (i.getInquirer().equals(inquirer) && i.getMissingPerson().equals(victim) && i.getDateOfInquiry().equals(date)) {
@@ -335,6 +495,11 @@ public class ReliefController {
         return null;
     }
 
+    /**
+     * Fetch inquiry from inquiries array
+     * @param id id of inquiry
+     * @return inquiry if found, null otherwise
+     */
     public Inquiry fetchInquiry(int id) {
         for (Inquiry i : inquiries) {
             if (i.getId() == id) {
@@ -344,6 +509,11 @@ public class ReliefController {
         return null;
     }   
 
+    /**
+     * Fetch family group from familyGroups array
+     * @param id id of family group
+     * @return family group if found, null otherwise
+     */
     public FamilyGroup fetchFamilyGroup(int id) {
         for (FamilyGroup f : familyGroups) {
             if (f.getId() == id) {
@@ -353,6 +523,9 @@ public class ReliefController {
         return null;
     }
 
+    /**
+     * Save data to database
+     */
     public void saveData(){
         try {
             for( Person p : people) {
@@ -373,7 +546,11 @@ public class ReliefController {
 
     }
 
-    public void loadLocations() throws SQLException, IllegalArgumentException {
+    /**
+     * Load locations from database
+     * @throws SQLException if database query fails
+     */
+    public void loadLocations() throws SQLException{
         String rs = fetcher.getEntries("Location", "location_id");
 
         String[] rows = rs.split("\n");
@@ -395,6 +572,10 @@ public class ReliefController {
         }
     }
 
+    /**
+     * Load people from database
+     * @throws SQLException if database query fails
+     */
     public void loadPeople() throws SQLException {
         String rs = fetcher.getEntries("Person", "person_id");
 
@@ -428,6 +609,10 @@ public class ReliefController {
         }
     }
 
+    /**
+     * Load current locations from database
+     * @throws SQLException if database query fails
+     */
     public void loadCurrentLocations() throws SQLException {
         String rs = fetcher.getEntries("PersonLocation");
 
@@ -447,6 +632,10 @@ public class ReliefController {
         }
     }
     
+    /**
+     * Load family groups from database
+     * @throws SQLException if database query fails
+     */
     public void loadFamilyGroups() throws SQLException {
 
         String rs = fetcher.getEntries("Person", "person_id");
@@ -479,6 +668,10 @@ public class ReliefController {
         }
     }
 
+    /**
+     * Load inquiries from database
+     * @throws SQLException if database query fails
+     */
     public void loadInquiries() throws SQLException {
         String rs = fetcher.getEntries("Inquiry", "inquiry_id");
 
@@ -506,6 +699,10 @@ public class ReliefController {
         }
     }
 
+    /**
+     * Load supplies from database
+     * @throws SQLException if database query fails
+     */
     public void loadSupplies() throws SQLException {
         
         String rs = fetcher.getEntries("Supply", "supply_id");
@@ -606,6 +803,10 @@ public class ReliefController {
         }
     }
 
+    /**
+     * Load medical records from database
+     * @throws SQLException if database query fails
+     */
     public void loadMedicalRecords() throws SQLException {
         String rs = fetcher.getEntries("MedicalRecord", "medical_record_id");
 
@@ -632,11 +833,19 @@ public class ReliefController {
         }
     }
 
+    /**
+     * Reflects a supply transfer from one location to another in database
+     * @param victim the victim to transfer the supply to
+     * @param supply the supply to transfer
+     * @throws SQLException if database query fails
+     * @throws IllegalArgumentException if the victim or supply is null
+     */
     public void reflectSupplyTransfer(DisasterVictim victim, Supply supply) throws SQLException, IllegalArgumentException {
         victim.transferSupply(supply);
         String query = "DELETE FROM SupplyAllocation WHERE location_id = " + victim.getCurrentLocation().getId() + " AND supply_id = " + supply.getId();
         String[] args = new String[0];
         String[] types = new String[0];
-        fetcher.deadEndQuery(query, args, types);
+        int result = fetcher.deadEndQuery(query, args, types);
+        System.out.println(result);
     }
 }

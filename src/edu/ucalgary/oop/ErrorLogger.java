@@ -1,27 +1,31 @@
+/**
+ * @author Noah Vickerson
+ * ErrorLogger.java 
+ * @version 1.0
+ * @date Apr 1 2025
+ */
+
 package edu.ucalgary.oop;
 
 import java.io.*;
-import java.util.Random;
 import java.util.Date;
 
 public class ErrorLogger {
     private String fileName;
     private RandomAccessFile logFile;
 
+    /**
+     * Constructor
+     * @param fileName
+     */
     public ErrorLogger(String fileName) {
         this.fileName = fileName;
     }
 
-    public static void main (String[] args) {
-        ErrorLogger logger = new ErrorLogger("errorlog.txt");
-        try {
-            throw new IllegalArgumentException("Test error message");
-        }
-        catch (Exception e) {
-            logger.logError(e);
-        }
-    }
-
+    /**
+     * Logs an error, formats it and writes it to the log file
+     * @param e the error to log
+     */
     public void logError(Exception e) {
         try {
             logFile = new RandomAccessFile(fileName, "rw");

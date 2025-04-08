@@ -1,3 +1,10 @@
+/**
+ * @author Noah Vickerson
+ * Supply.java 
+ * @version 1.1
+ * @date Apr 1 2025
+ */
+
 package edu.ucalgary.oop;
 
 import java.io.*;
@@ -8,32 +15,30 @@ import java.util.regex.*;
 public class TextInputValidator {
     private ArrayList<String> keys;
     private ArrayList<String> translations;
-    private static TextInputValidator instance = null;
 
+    /**
+     * Initializes the TextInputValidator
+     * @param languageFilePath of the language file
+     * @throws IllegalArgumentException if the TextInputValidator has already been initialized
+     * Not a singleton, will replace the existing instance
+     */
     public TextInputValidator(String languageFilePath) throws IllegalArgumentException {
-        if (instance != null) {
-            throw new IllegalArgumentException("TextInputValidator has already been initialized");
-        }
-
         keys = new ArrayList<>();
         translations = new ArrayList<>();
         
         try {
             readLanguageFile(languageFilePath);
-            instance = this;
         }
         catch (Exception e) {
             throw new IllegalArgumentException(e.getMessage());
         }
     }
 
-    public static TextInputValidator getInstance() throws IllegalArgumentException {
-        if (instance == null) {
-            throw new IllegalArgumentException("TextInputValidator has not been initialized");
-        }
-        return instance;
-    }
-
+    /**
+     * Returns the key for a given translation
+     * @param translation
+     * @return key
+     */
     public String translateToKey(String translation) {
         if(translations.contains(translation)){
             return keys.get(translations.indexOf(translation));
@@ -45,6 +50,11 @@ public class TextInputValidator {
         }
     }
 
+    /**
+     * Returns the translation for a given key
+     * @param key
+     * @return translation
+     */
     public String translateToLanguage(String key) {
         if(key == null){
             return null;
@@ -57,6 +67,11 @@ public class TextInputValidator {
         }
     }
 
+    /**
+     * Checks if the date format is valid
+     * @param date
+     * @return true if valid
+     */
     public static boolean isValidDateFormat(String date) {
         if(date == null) {
             return true;
@@ -65,6 +80,11 @@ public class TextInputValidator {
         return date.matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}$") || date.equalsIgnoreCase("null");
     }
 
+    /**
+     * Checks if the gender is valid
+     * @param gender
+     * @return
+     */
     public static boolean isValidGender(String gender) {
         if(gender == null) {
             return true;
@@ -77,6 +97,11 @@ public class TextInputValidator {
         return false;
     }
 
+    /**
+     * Checks if the phone number is valid
+     * @param phoneNum
+     * @return true if valid
+     */
     public static boolean isValidPhoneNum(String phoneNum) {
         if(phoneNum == null) {
             return true;
@@ -85,31 +110,54 @@ public class TextInputValidator {
         return phoneNum.matches("^[0-9]{3}-[0-9]{3}-[0-9]{4}$") || phoneNum.equalsIgnoreCase("null") || phoneNum.matches("^[0-9]{3}-[0-9]{4}$");
     }
 
-    
+    /**
+     * Checks if the quantity is valid
+     * @param quantity
+     * @return true if valid
+     */
     public static boolean isValidQuantity(String quantity){
         if(!quantity.matches("^\\d+$")){
             return false;
         }
-        return Integer.parseInt(quantity) >= 0;
+        return Integer.parseInt(quantity) >= 0; // technically redundant
     }
 
+    /**
+     * Checks if the grid is valid
+     * @param grid
+     * @return true if valid
+     */
     public static boolean isValidGrid(String grid) {
         Pattern pattern = Pattern.compile("^[A-Za-z]\\d+$");
         Matcher matcher = pattern.matcher(grid);
         return matcher.matches();
     }
 
+    /**
+     * Checks if the room is valid
+     * @param grid
+     * @return true if valid
+     */
     public static boolean isValidRoom(String grid) {
-        Pattern pattern = Pattern.compile("^[A-Za-z]*$");
+        Pattern pattern = Pattern.compile("^\\d+$");
         Matcher matcher = pattern.matcher(grid);
         return matcher.matches();
     }
 
+    /**
+     * Checks if the number is valid
+     * @param number
+     * @return true if valid
+     */
     public static boolean isNumeric(String number) {
         return number.matches("^-?\\d+$");
     }
 
-
+    /**
+     * parses language file to get key value pairs
+     * @param languageFilePath
+     * @throws Exception if file is not valid
+     */
     private void readLanguageFile(String languageFilePath) throws Exception {
         Scanner scanner = new Scanner(new FileInputStream(languageFilePath), "UTF-8");
         boolean inTranslation = false;

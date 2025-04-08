@@ -1,3 +1,10 @@
+/**
+ * @author Noah Vickerson
+ * DisasterVictim.java 
+ * @version 1.3
+ * @date Apr 7 2025
+ */
+
 package edu.ucalgary.oop;
 
 import java.util.Arrays;
@@ -8,41 +15,76 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.sql.*;
 
-public class DisasterVictim extends Person {
+public class DisasterVictim extends Person implements SupplyHolder {
     private Location currentLocation;
     private MedicalRecord[] medicalRecords;
-    private Supply[] personalBelongings;
+    private Posession[] personalBelongings;
     private final String entryDate;
     private TextInputValidator validator;
 
+    /**
+     * Constructor autogenerate id
+     * @param firstName
+     * @param lastName
+     * @param birthDate must be yyyy-mm-dd
+     * @param gender    must be "male" or "female" or "non_binary"
+     * @param phoneNum  must be (xxx-)xxx-xxxx
+     * @param entryDate must be yyyy-mm-dd
+     * @throws IllegalArgumentException if the above conditions not met
+     */
     public DisasterVictim(String firstName, String lastName, String birthDate, String gender, String phoneNum, String entryDate) throws IllegalArgumentException {
         super(firstName, lastName, birthDate, gender, phoneNum, "disastervictim");
 
+        this.validator = new TextInputValidator("../data/en-CA.xml"); // for database values
+
         if(!isValidDateFormat(entryDate)){
-            throw new IllegalArgumentException("Invalid date format: " +  entryDate);
+            throw new IllegalArgumentException("inv_date");
         }
         this.entryDate = entryDate;
-        validator = TextInputValidator.getInstance();
     }
 
+    /**
+     * Constructor
+     * @param id        must be greater than alll other initialized ids
+     * @param firstName
+     * @param lastName
+     * @param birthDate must be yyyy-mm-dd
+     * @param gender    must be "male" or "female" or "non_binary"
+     * @param phoneNum  must be (xxx-)xxx-xxxx
+     * @param entryDate must be yyyy-mm-dd
+     * @throws IllegalArgumentException if the above conditions not met
+     */ 
     public DisasterVictim(int id, String firstName, String lastName, String birthDate, String gender, String phoneNum, String entryDate) throws IllegalArgumentException {
         super(id, firstName, lastName, birthDate, gender, phoneNum, "disastervictim");
 
+        this.validator = new TextInputValidator("../data/en-CA.xml"); // for database values
+
         if(!isValidDateFormat(entryDate)){
-            throw new IllegalArgumentException("Invalid date format: " +  entryDate);
+            throw new IllegalArgumentException("inv_date");
         }
         this.entryDate = entryDate;
-        validator = TextInputValidator.getInstance();
     }
 
+    /**
+     * Get the list of medical records
+     * @return the list of medical records
+     */
     public MedicalRecord[] getMedicalRecords() {
         return medicalRecords;
     }
 
+    /**
+     * Set the list of medical records
+     * @param medicalRecords the list of medical records
+     */
     public void setMedicalRecords(MedicalRecord[] medicalRecords) {
         this.medicalRecords = medicalRecords;
     }
 
+    /**
+     * Add a medical record to the list of medical records
+     * @param record the medical record to add
+     */
     public void addMedicalRecord(MedicalRecord record){
         if(medicalRecords == null){
             medicalRecords = new MedicalRecord[1];
@@ -57,6 +99,10 @@ public class DisasterVictim extends Person {
         }
     }
 
+    /**
+     * Remove a medical record from the list of medical records
+     * @param record the medical record to remove
+     */
     public void removeMedicalRecord(MedicalRecord record){
         MedicalRecord[] smallerRecords = new MedicalRecord[medicalRecords.length - 1];
         int index = 0;
@@ -76,20 +122,32 @@ public class DisasterVictim extends Person {
         medicalRecords = smallerRecords;
     }
 
-    public Supply[] getPersonalBelongings() {
+    /**
+     * Get the list of personal belongings
+     * @return the list of personal belongings
+     */
+    public Posession[] getPersonalBelongings() {
         return personalBelongings;
     }
 
-    public void setPersonalBelongings(Supply[] personalBelongings) {
+    /**
+     * Set the list of personal belongings
+     * @param personalBelongings the list of personal belongings
+     */
+    public void setPersonalBelongings(Posession[] personalBelongings) {
         this.personalBelongings = personalBelongings;
     }
 
-    public void addPersonalBelonging(Supply supply){
+    /**
+     * Add a personal belonging to the list of personal belongings
+     * @param supply the personal belonging to add
+     */
+    public void addPersonalBelonging(Posession supply){
         if(personalBelongings == null){
-            personalBelongings = new Supply[1];
+            personalBelongings = new Posession[1];
             personalBelongings[0] = supply;
         } else {
-            Supply[] largerBelongings = new Supply[personalBelongings.length + 1];
+            Posession[] largerBelongings = new Posession[personalBelongings.length + 1];
             for(int i = 0; i < personalBelongings.length; i++){
                 largerBelongings[i] = personalBelongings[i];
             }
@@ -98,11 +156,16 @@ public class DisasterVictim extends Person {
         }
     }
 
-    public void removePersonalBelonging(Supply supply) throws IllegalArgumentException{
-        Supply[] smallerBelongings = new Supply[personalBelongings.length - 1];
+    /**
+     * Remove a personal belonging from the list of personal belongings
+     * @param supply
+     * @throws IllegalArgumentException if the supply is not in the personal belongings
+     */
+    public void removePersonalBelonging(Posession supply) throws IllegalArgumentException{
+        Posession[] smallerBelongings = new Posession[personalBelongings.length - 1];
         int index = 0;
         boolean foundSupply = false;
-        for(Supply personalBelonging : personalBelongings){
+        for(Posession personalBelonging : personalBelongings){
             if(personalBelonging != supply){
                 smallerBelongings[index] = personalBelonging;
                 index++;
@@ -112,26 +175,50 @@ public class DisasterVictim extends Person {
         }
 
         if(!foundSupply){
-            throw new IllegalArgumentException("The supply is not in the personal belongings");
+            throw new IllegalArgumentException("supply_not_found");
         }
         personalBelongings = smallerBelongings;
     }
 
-    public void transferSupply(Supply supply) throws IllegalArgumentException {
+    /**
+     * Alias for removePersonalBelonging
+     * @param supply
+     * @throws IllegalArgumentException
+     */
+    public void removeSupply(Posession supply) throws IllegalArgumentException{
+        this.removePersonalBelonging(supply);
+    }
+
+    /**
+     * Alias for addPersonalBelonging
+     * @param supply the supply to add
+     */
+    public void addSupply(Posession supply){
+        this.addPersonalBelonging(supply);
+    }
+
+    /**
+     * Transfer a supply from the current location to the personal belongings
+     * @param supply the supply to transfer
+     * @throws IllegalArgumentException if the supply is not in the current location
+     */
+    public void transferSupply(Posession supply) throws IllegalArgumentException {
         if(!this.currentLocation.containsSupply(supply)){
-            throw new IllegalArgumentException("The supply is not in the current location");
+            throw new IllegalArgumentException("supply_not_found");
         }
 
         this.currentLocation.removeSupply(supply);
         this.addPersonalBelonging(supply);
     }
 
-    public void addSupply(Supply supply){
-        this.addPersonalBelonging(supply);
-    }
 
+
+    /**
+     * Deletes water with allocation date before the current date with the consumption offset
+     * @param currentDate
+     */
     public void removeUsedSupplies(String currentDate){
-        for(Supply supply : this.personalBelongings){
+        for(Posession supply : this.personalBelongings){
             if(supply.getType() == "Water"){
                 Water water = (Water) supply;
                 if(water.isConsumed(currentDate)){
@@ -141,10 +228,18 @@ public class DisasterVictim extends Person {
         }
     }
 
+    /**
+     * Get the current location
+     * @return the current location
+     */
     public Location getCurrentLocation() {
         return currentLocation;
     }
 
+    /**
+     * Set the current location
+     * @param currentLocation the current location
+     */
     public void setCurrentLocation(Location currentLocation) {
         if(this.currentLocation != null){
             this.currentLocation.removeOccupant(this);
@@ -153,10 +248,31 @@ public class DisasterVictim extends Person {
         this.currentLocation.addOccupant(this);
     }
 
+    /**
+     * Check if a supply is in the personal belongings
+     * @return found if supply in personal belongings
+     */
+    public boolean containsSupply(Posession supply) {
+        boolean found = false;
+        for(Posession personalBelonging : personalBelongings){
+            if(personalBelonging == supply){
+                found = true;
+            }
+        }
+        return found;
+    }
+
+    /**
+     * Get the entry date
+     * @return the entry date
+     */
     public String getEntryDate() {
         return entryDate;
     }
 
+    /**
+     * Override the addEntry method from the Person class to add insertion into locations
+     */
     @Override
     public void addEntry() throws SQLException {
         if(this.familyGroup == null) {
@@ -180,6 +296,10 @@ public class DisasterVictim extends Person {
         db.deadEndQuery(query, values, types);
     }
 
+    /**
+     * Override the updateEntry method from the Person class to update locations and supply allocation
+     */
+    @Override
     public void updateEntry() throws SQLException {
         if (this.familyGroup == null) {
             String query = "UPDATE Person SET person_id = ?, first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, comments = ?, phone_number = ?, family_group = NULL WHERE person_id = ?";
@@ -196,32 +316,29 @@ public class DisasterVictim extends Person {
         }
 
         if(this.personalBelongings != null){
-            for(Supply s : this.personalBelongings) {
-                try{
-                    String query = "INSERT INTO SupplyAllocation (supply_id, person_id, location_id, allocation_date) VALUES (?, ?, ?, ?)";
-                    String curDate = null;
+            for(Posession s : this.personalBelongings) {
+                // update in case where supply exists
+                String query = "UPDATE SupplyAllocation SET supply_id = ?, person_id = ?, location_id = NULL, allocation_date = ? WHERE supply_id = ?";
+                String curDate = null;
+                if(s instanceof Water && ((Water)s).getAllocationDate() != null){
+                    curDate = ((Water)s).getAllocationDate();
+                }else{
+                    curDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).toString().substring(0, 10);
+                }
+                String[] values = {String.valueOf(s.getId()), String.valueOf(id), curDate, String.valueOf(s.getId())};
+                String[] types = {"int", "int", "date", "int"};
+                DbConnector db = DbConnector.getInstance();
+                if(db.deadEndQuery(query, values, types) == 0){
+                    query = "INSERT INTO SupplyAllocation (supply_id, person_id, location_id, allocation_date) VALUES (?, ?, ?, ?)";
+                    curDate = null;
                     if(s instanceof Water && ((Water)s).getAllocationDate() != null){
                         curDate = ((Water)s).getAllocationDate();
                     }else{
                         curDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).toString().substring(0, 10);
                     }
-                    String[] values = {String.valueOf(s.getId()), String.valueOf(id), "NULL", curDate};
-                    String[] types = {"int", "int", "int", "date"};
-                    DbConnector db = DbConnector.getInstance();
-                    db.deadEndQuery(query, values, types);
-                } catch (SQLException e) {
-                    // update in case where supply exists
-                    String query = "UPDATE SupplyAllocation SET supply_id = ?, person_id = ?, location_id = NULL, allocation_date = ? WHERE supply_id = ?";
-                    String curDate = null;
-                    if(s instanceof Water && ((Water)s).getAllocationDate() != null){
-                        curDate = ((Water)s).getAllocationDate();
-                    }else{
-                        curDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).toString().substring(0, 10);
-                    }
-                    String[] values = {String.valueOf(s.getId()), String.valueOf(id), curDate, String.valueOf(s.getId())};
-                    String[] types = {"int", "int", "date", "int"};
-                    DbConnector db = DbConnector.getInstance();
-                    db.deadEndQuery(query, values, types);
+                    String[] values2 = {String.valueOf(s.getId()), String.valueOf(id), "NULL", curDate};
+                    String[] types2 = {"int", "int", "int", "date"};
+                    db.deadEndQuery(query, values2, types2);
                 }
             }
  

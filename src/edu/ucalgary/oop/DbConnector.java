@@ -1,3 +1,10 @@
+/**
+ * @author Noah Vickerson
+ * DbConnector.java 
+ * @version 1.5
+ * @date Apr 7 2025
+ */
+
 package edu.ucalgary.oop;
 
 import java.sql.*;
@@ -9,10 +16,25 @@ public class DbConnector implements DatabaseQueryHandler {
 
     private static DbConnector instance = null;
 
+    /**
+     * Constructor
+     * @param url url of database
+     * @param user username
+     * @param pw password
+     * @throws SQLException
+     */
     private DbConnector(String url, String user, String pw) throws SQLException {
         db = DriverManager.getConnection(url, user, pw);
     }
 
+    /**
+     * Singleton instance
+     * @param url
+     * @param user
+     * @param pw
+     * @return the static object
+     * @throws SQLException for connnection failures
+     */
     public static DbConnector getInstance(String url, String user, String pw) throws SQLException {
         if(instance == null) {
             instance = new DbConnector(url, user, pw);
@@ -21,10 +43,26 @@ public class DbConnector implements DatabaseQueryHandler {
         return instance;
     }
 
-    public static DbConnector getInstance() {
+    /**
+     * Singleton instance
+     * @return the static object if instantiated
+     */
+    public static DbConnector getInstance() throws IllegalStateException {
+        if(instance == null) {
+            throw new IllegalStateException("db_not_init");
+        }
         return instance;
     }
 
+    /**
+     * Returns the result of a query with a return (ie select queries)
+     * @param query the query string
+     * @param data any values to add in with prepared statement
+     * @param types the types of the values
+     * @return the result of the query
+     * @throws SQLException for connection failures
+     * @throws IllegalArgumentException if types and data arrays are not the same length
+     */
     public String returnQuery(String query, String[] data, String types[]) throws SQLException, IllegalArgumentException {
         String result = "";
 
@@ -64,7 +102,16 @@ public class DbConnector implements DatabaseQueryHandler {
         return result;
     }
 
-    public void deadEndQuery(String query, String[] data, String types[]) throws SQLException, IllegalArgumentException {
+    /**
+     * Returns the result of a query with no return (update, delete, etc)
+     * @param query the query string
+     * @param data any values to add in with prepared statement
+     * @param types the types of the values
+     * @return the result of the query
+     * @throws SQLException for connection failures
+     * @throws IllegalArgumentException if types and data arrays are not the same length
+     */
+    public int deadEndQuery(String query, String[] data, String types[]) throws SQLException, IllegalArgumentException {
         if(types.length != data.length) {
             throw new IllegalArgumentException("Types and data arrays should be the same length");
         }
@@ -94,10 +141,16 @@ public class DbConnector implements DatabaseQueryHandler {
                 }
             }
         }
-        stmt.executeUpdate();
+        int result = stmt.executeUpdate();
         stmt.close();
+
+        return result;
     }
 
+    /**
+     * Closes the connection
+     * @throws SQLException for close failures
+     */
     public void close() throws SQLException {
         db.close();
     }
