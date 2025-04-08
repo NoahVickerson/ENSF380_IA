@@ -10,10 +10,10 @@ package edu.ucalgary.oop;
 import java.sql.*;
 
 public class MedicalRecord implements DatabaseInterfaceable {
-    private Location location;
+    private OccupantHolder location;
     private String treatmentDetails;
     private String dateOfTreatment;
-    private DisasterVictim person;
+    private Occupant person;
     private final int id;
     private static int counter = 0;
 
@@ -25,7 +25,7 @@ public class MedicalRecord implements DatabaseInterfaceable {
      * @param dateOfTreatment must be in the format YYYY-MM-DD
      * @throws IllegalArgumentException for invalid dateoftreatment
      */
-    public MedicalRecord(Location location, DisasterVictim person, String treatmentDetails, String dateOfTreatment) throws IllegalArgumentException {
+    public MedicalRecord(OccupantHolder location, Occupant person, String treatmentDetails, String dateOfTreatment) throws IllegalArgumentException {
         if(!isValidDateFormat(dateOfTreatment)){
             throw new IllegalArgumentException("inv_date");
         }
@@ -47,7 +47,7 @@ public class MedicalRecord implements DatabaseInterfaceable {
      * @param dateOfTreatment must be in the format YYYY-MM-DD
      * @throws IllegalArgumentException for invalid dateoftreatment or id
      */
-    public MedicalRecord(int id, Location location, DisasterVictim person, String treatmentDetails, String dateOfTreatment) throws IllegalArgumentException {
+    public MedicalRecord(int id, OccupantHolder location, Occupant person, String treatmentDetails, String dateOfTreatment) throws IllegalArgumentException {
         if(!isValidDateFormat(dateOfTreatment)){
             throw new IllegalArgumentException("inv_date");
         }
@@ -69,7 +69,7 @@ public class MedicalRecord implements DatabaseInterfaceable {
      * Returns the location
      * @return location
      */
-    public Location getLocation() {
+    public OccupantHolder getLocation() {
         return location;
     }
 
@@ -77,7 +77,7 @@ public class MedicalRecord implements DatabaseInterfaceable {
      * Sets the location
      * @param location
      */
-    public void setLocation(Location location) {
+    public void setLocation(OccupantHolder location) {
         this.location = location;
     }
 
@@ -85,7 +85,7 @@ public class MedicalRecord implements DatabaseInterfaceable {
      * Returns the person
      * @return person
      */
-    public DisasterVictim getPerson() {
+    public Occupant getPerson() {
         return person;
     }
 
@@ -93,7 +93,7 @@ public class MedicalRecord implements DatabaseInterfaceable {
      * Sets the person
      * @param person
      */
-    public void setPerson(DisasterVictim person) {
+    public void setPerson(Occupant person) {
         this.person = person;
     }
 

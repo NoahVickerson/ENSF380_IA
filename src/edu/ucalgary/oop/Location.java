@@ -9,7 +9,7 @@ package edu.ucalgary.oop;
 import java.util.Arrays;
 import java.sql.*;
 
-public class Location implements OccupantHolder, SupplyHolder {
+public class Location implements OccupantSupplyHolder {
 	private String name;
 	private String address;
 	private final int id;

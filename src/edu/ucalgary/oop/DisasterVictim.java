@@ -16,7 +16,7 @@ import java.time.*;
 import java.sql.*;
 
 public class DisasterVictim extends Person implements SupplyHolder, Occupant {
-    private OccupantHolder currentLocation;
+    private OccupantSupplyHolder currentLocation;
     private MedicalRecord[] medicalRecords;
     private Posession[] personalBelongings;
     private final String entryDate;
@@ -253,7 +253,7 @@ public class DisasterVictim extends Person implements SupplyHolder, Occupant {
      * Get the current location
      * @return the current location
      */
-    public OccupantHolder getCurrentLocation() {
+    public OccupantSupplyHolder getCurrentLocation() {
         return currentLocation;
     }
 
@@ -261,12 +261,17 @@ public class DisasterVictim extends Person implements SupplyHolder, Occupant {
      * Set the current location
      * @param currentLocation the current location
      */
-    public void setCurrentLocation(OccupantHolder currentLocation) {
-        if(this.currentLocation != null){
-            this.currentLocation.removeOccupant(this);
+    public void setCurrentLocation(OccupantHolder currentLocation) throws IllegalArgumentException {
+        if(currentLocation instanceof SupplyHolder){
+            OccupantSupplyHolder supplyHolder = (OccupantSupplyHolder) currentLocation;
+            if(this.currentLocation != null){
+                this.currentLocation.removeOccupant(this);
+            }
+            this.currentLocation = supplyHolder;
+            this.currentLocation.addOccupant(this);
+        }else{
+            throw new IllegalArgumentException("loc_not_supply_holder");
         }
-        this.currentLocation = currentLocation;
-        this.currentLocation.addOccupant(this);
     }
 
     /**

@@ -927,8 +927,8 @@ public class UserInterface extends JFrame {
 
 
         // allow adding supplies
-        if(person.getCurrentLocation() != null && (person.getCurrentLocation() instanceof SupplyHolder)) {
-            Posession[] locationSupplies = ((SupplyHolder)person.getCurrentLocation()).getSupplies();
+        if(person.getCurrentLocation() != null) {
+            Posession[] locationSupplies = person.getCurrentLocation().getSupplies();
             personPanel.add(new JLabel(validator.translateToLanguage("hr")));
             personPanel.add(new JLabel(validator.translateToLanguage("supplies")));
 
