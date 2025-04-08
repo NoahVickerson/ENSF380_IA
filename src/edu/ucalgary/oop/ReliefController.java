@@ -840,7 +840,7 @@ public class ReliefController {
      * @throws SQLException if database query fails
      * @throws IllegalArgumentException if the victim or supply is null
      */
-    public void reflectSupplyTransfer(DisasterVictim victim, Supply supply) throws SQLException, IllegalArgumentException {
+    public void reflectSupplyTransfer(DisasterVictim victim, Posession supply) throws SQLException, IllegalArgumentException {
         victim.transferSupply(supply);
         String query = "DELETE FROM SupplyAllocation WHERE location_id = " + victim.getCurrentLocation().getId() + " AND supply_id = " + supply.getId();
         String[] args = new String[0];

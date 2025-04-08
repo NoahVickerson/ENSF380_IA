@@ -37,7 +37,6 @@ public class UserInterface extends JFrame {
             try {
                 controller = ReliefController.getInstance(uname, pword, validator);
             }catch (IllegalArgumentException e) {
-                e.printStackTrace();
                 displayError(validator.translateToLanguage("upass_incorrect") + "\n" + e.getMessage());
                 loggedIn = false;
                 continue;
@@ -45,7 +44,6 @@ public class UserInterface extends JFrame {
                 logger.logError(e);
                 exit(validator.translateToLanguage("db_err") + "\n" + e.getMessage(), 1);
             }catch (Exception e) {
-                e.printStackTrace();
                 logger.logError(e);
                 exit(validator.translateToLanguage("uncaught_exc") + e.getMessage(), 1);
             }
@@ -852,6 +850,7 @@ public class UserInterface extends JFrame {
                 try {
                     person.addFamilyMember(possibleFamily[familyInput.getSelectedIndex()]);
                     possibleFamily[familyInput.getSelectedIndex()].updateEntry();
+                    person.updateEntry();
                     displayError(validator.translateToLanguage("add_family_success"));
                 } catch (IllegalArgumentException e1) {
                     e1.printStackTrace();
@@ -926,7 +925,7 @@ public class UserInterface extends JFrame {
 
         // allow adding supplies
         if(person.getCurrentLocation() != null) {
-            Supply[] locationSupplies = person.getCurrentLocation().getSupplies();
+            Posession[] locationSupplies = person.getCurrentLocation().getSupplies();
             personPanel.add(new JLabel(validator.translateToLanguage("hr")));
             personPanel.add(new JLabel(validator.translateToLanguage("supplies")));
 
@@ -1297,7 +1296,7 @@ public class UserInterface extends JFrame {
                 personPanels[i].add(new JLabel("\n\n" + validator.translateToLanguage("pb")));
 
                 if(person.getPersonalBelongings() != null){
-                    Supply[] supplies = person.getPersonalBelongings();
+                    Posession[] supplies = person.getPersonalBelongings();
                 for(int j = 0; j < supplies.length; j++){
                     personPanels[i].add(new JLabel(validator.translateToLanguage("hr")));
                     if(supplies[j] instanceof Cot){
@@ -1316,10 +1315,12 @@ public class UserInterface extends JFrame {
                         personPanels[i].add(new JLabel(validator.translateToLanguage("quantity") + pb.getQuantity()));
                         personPanels[i].add(new JLabel(validator.translateToLanguage("comments") + pb.getComments()));
                         personPanels[i].add(new JLabel(validator.translateToLanguage("desc") + pb.getDescription()));
-                    }else{
+                    }else if (supplies[j] instanceof Supply){
                         personPanels[i].add(new JLabel(validator.translateToLanguage(supplies[j].getType())));
                         personPanels[i].add(new JLabel(validator.translateToLanguage("comments") + supplies[j].getComments()));
                         personPanels[i].add(new JLabel(validator.translateToLanguage("quantity") + supplies[j].getQuantity()));
+                    }else{
+                        continue;
                     }
                     personPanels[i].add(new JLabel(validator.translateToLanguage("id") + supplies[j].getId()));
                 }
@@ -1402,7 +1403,7 @@ public class UserInterface extends JFrame {
 
             locationPanel.add(new JLabel(validator.translateToLanguage("supplies")));
             if(locations[i].getSupplies() != null){
-                Supply[] supplies = locations[i].getSupplies();
+                Posession[] supplies = locations[i].getSupplies();
                 for(int j = 0; j < supplies.length; j++){
                     locationPanel.add(new JLabel(validator.translateToLanguage("hr")));
                     if(supplies[j] instanceof Cot){

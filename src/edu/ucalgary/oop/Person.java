@@ -290,6 +290,9 @@ public class Person implements DatabaseInterfaceable {
                 familyGroup = new FamilyGroup(this, familyMember);
             }
         } else {
+            if (familyMember.getFamilyGroup() != null) {
+                throw new IllegalArgumentException("inv_family");
+            }
             familyMember.setFamilyGroup(familyGroup);
         }
 

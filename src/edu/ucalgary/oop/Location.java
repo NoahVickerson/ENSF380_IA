@@ -15,7 +15,7 @@ public class Location implements OccupantHolder, SupplyHolder {
 	private final int id;
 	private static int counter = 0;
 	
-	private DisasterVictim[] occupants = new DisasterVictim[0];
+	private Occupant[] occupants = new DisasterVictim[0];
 	private Posession[] supplies = new Posession[0];
 	
 	/**
@@ -93,7 +93,7 @@ public class Location implements OccupantHolder, SupplyHolder {
 	 * Returns the occupants
 	 * @return occupants
 	 */
-	public DisasterVictim[] getOccupants(){
+	public Occupant[] getOccupants(){
 		return this.occupants;
 	}
 	
@@ -101,7 +101,7 @@ public class Location implements OccupantHolder, SupplyHolder {
 	 * Sets the occupants
 	 * @param occupants
 	 */
-	public void setOccupants(DisasterVictim[] occupants){
+	public void setOccupants(Occupant[] occupants){
 		this.occupants = occupants;
 	}
 	
@@ -125,9 +125,9 @@ public class Location implements OccupantHolder, SupplyHolder {
 	 * Adds an occupant
 	 * @param occupant
 	 */
-	public void addOccupant(DisasterVictim occupant){
+	public void addOccupant(Occupant occupant){
 
-		for(DisasterVictim occupantInList : this.occupants){
+		for(Occupant occupantInList : this.occupants){
 			if(occupantInList.getLastName() == occupant.getLastName() && occupantInList.getFirstName() == occupant.getFirstName()){
 				return;
 			}
@@ -141,15 +141,15 @@ public class Location implements OccupantHolder, SupplyHolder {
 	 * Removes an occupant
 	 * @param occupant
 	 */
-	public void removeOccupant(DisasterVictim occupant){
+	public void removeOccupant(Occupant occupant){
 		if(this.occupants.length == 0){
 			return;
 		}
 
-		DisasterVictim[] smallerOccupants = new DisasterVictim[this.occupants.length - 1];
+		Occupant[] smallerOccupants = new Occupant[this.occupants.length - 1];
 		int index = 0;
 		boolean foundOccupant = false;
-		for(DisasterVictim occupantInList : this.occupants){
+		for(Occupant occupantInList : this.occupants){
 			if(occupantInList.getLastName() != occupant.getLastName() && occupantInList.getFirstName() != occupant.getFirstName()){
 				smallerOccupants[index] = occupantInList;
 				index++;

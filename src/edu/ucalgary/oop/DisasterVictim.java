@@ -15,8 +15,8 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.sql.*;
 
-public class DisasterVictim extends Person implements SupplyHolder {
-    private Location currentLocation;
+public class DisasterVictim extends Person implements SupplyHolder, Occupant {
+    private OccupantHolder currentLocation;
     private MedicalRecord[] medicalRecords;
     private Posession[] personalBelongings;
     private final String entryDate;
@@ -139,6 +139,22 @@ public class DisasterVictim extends Person implements SupplyHolder {
     }
 
     /**
+     * alias for getPersonalBelongings
+     * @return the list of personal belongings
+     */
+    public Posession[] getSupplies() {
+        return personalBelongings;
+    }
+
+    /**
+     * alias for setPersonalBelongings
+     * @param supplies the list of personal belongings
+     */
+    public void setSupplies(Posession[] supplies) {
+        this.personalBelongings = supplies;
+    }
+
+    /**
      * Add a personal belonging to the list of personal belongings
      * @param supply the personal belonging to add
      */
@@ -203,12 +219,17 @@ public class DisasterVictim extends Person implements SupplyHolder {
      * @throws IllegalArgumentException if the supply is not in the current location
      */
     public void transferSupply(Posession supply) throws IllegalArgumentException {
-        if(!this.currentLocation.containsSupply(supply)){
-            throw new IllegalArgumentException("supply_not_found");
-        }
+        if(!(this.currentLocation instanceof SupplyHolder)){
+            throw new IllegalArgumentException("loc_not_supply_holder");
+        }else{
+            SupplyHolder holder = (SupplyHolder) this.currentLocation;
+            if(!holder.containsSupply(supply)){
+                throw new IllegalArgumentException("supply_not_found");
+            }
 
-        this.currentLocation.removeSupply(supply);
-        this.addPersonalBelonging(supply);
+            holder.removeSupply(supply);
+            this.addSupply(supply);
+        }
     }
 
 
@@ -232,7 +253,7 @@ public class DisasterVictim extends Person implements SupplyHolder {
      * Get the current location
      * @return the current location
      */
-    public Location getCurrentLocation() {
+    public OccupantHolder getCurrentLocation() {
         return currentLocation;
     }
 
@@ -240,7 +261,7 @@ public class DisasterVictim extends Person implements SupplyHolder {
      * Set the current location
      * @param currentLocation the current location
      */
-    public void setCurrentLocation(Location currentLocation) {
+    public void setCurrentLocation(OccupantHolder currentLocation) {
         if(this.currentLocation != null){
             this.currentLocation.removeOccupant(this);
         }
