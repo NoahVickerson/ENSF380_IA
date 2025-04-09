@@ -87,7 +87,6 @@ public class DbConnector implements DatabaseQueryHandler {
         rs = stmt.executeQuery();
 
         int colCount = rs.getMetaData().getColumnCount();
-        ResultSetMetaData metaData = rs.getMetaData();
 
         while(rs.next()) {
             for(int i = 1; i <= colCount; i++) {

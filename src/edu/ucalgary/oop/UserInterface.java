@@ -924,8 +924,7 @@ public class UserInterface extends JFrame {
         }else{
             personPanel.add(createMedicalRecord(person));
         }
-
-
+        
         // allow adding supplies
         if(person.getCurrentLocation() != null) {
             Posession[] locationSupplies = person.getCurrentLocation().getSupplies();

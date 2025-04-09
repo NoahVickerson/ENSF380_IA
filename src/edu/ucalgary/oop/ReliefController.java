@@ -31,8 +31,6 @@ public class ReliefController {
      * @throws IllegalArgumentException with database connection errors due to invalid uname or password
      */
     private ReliefController(String url, String username, String password, TextInputValidator validator) throws SQLException, IllegalArgumentException {
-        LocalDate currentDate = LocalDate.now();
-        String dateString = currentDate.toString(); // get current date for water
 
         this.validator = validator;
         try {
@@ -61,9 +59,26 @@ public class ReliefController {
     /**
      * Default constructor without loading from database to test on test data
      */
-    private ReliefController() {
+    private ReliefController() throws SQLException, IllegalArgumentException {
         // for testing without a database dependency
+        fetcher = new MockDatabase();
+        this.validator = new TextInputValidator("../data/en-CA.xml");
 
+        loadLocations();
+
+        // populate people array
+        loadPeople();
+
+        // add currentLocation and famiy group fields
+        loadCurrentLocations();
+
+        loadFamilyGroups();
+
+        loadInquiries();
+
+        loadSupplies();
+
+        loadMedicalRecords();
     }
 
     /**
@@ -86,9 +101,13 @@ public class ReliefController {
      * @return ReliefController
      * @throws IllegalStateException when ReliefController has not been initialized
      */
-    public static ReliefController getInstance() throws IllegalStateException{
+    public static ReliefController getInstance() throws IllegalStateException {
         if(controller == null) {
-            controller = new ReliefController(); // for testing decoupled from the database
+            try{
+                controller = new ReliefController(); // for testing decoupled from the database
+            } catch (SQLException | IllegalArgumentException e) {
+                throw new IllegalStateException("Failed to connect to database" + "\n" + e.getMessage());
+            }
         }
         return controller;
     }
@@ -846,6 +865,5 @@ public class ReliefController {
         String[] args = new String[0];
         String[] types = new String[0];
         int result = fetcher.deadEndQuery(query, args, types);
-        System.out.println(result);
     }
 }
