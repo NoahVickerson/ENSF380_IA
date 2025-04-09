@@ -20,12 +20,12 @@ public class LocationTest {
     public void setUp() {
         // Initializing test objects before each test method
         location = new Location("Amis Shelter", "1234 Amis Shelterve");
-        victim = new DisasterVictim("Yaw", "Dwomoh", "2005-01-01", "m", "123-456-7890", "2024-01-01");
+        victim = new DisasterVictim("Yaw", "Dwomoh", "2005-01-01", "male", "123-456-7890", "2024-01-01");
         supply = new Supply("Water", 10);
     }
 
     // Helper method to check if a supply is in the list
-    private boolean containsSupply(Supply[] supplies, Supply supplyToCheck) {
+    private boolean containsSupply(Posession[] supplies, Posession supplyToCheck) {
         int i;
         for (i = 0; i < supplies.length; i++) {
             if (supplies[i] == supplyToCheck) {
@@ -59,16 +59,16 @@ public class LocationTest {
     @Test
     public void testAddOccupant() {
         location.addOccupant(victim);
-        DisasterVictim[] actualVictim = location.getOccupants();
+        Occupant[] actualVictim = location.getOccupants();
         assertEquals("addOccupant should add a disaster victim to the occupants list", victim, actualVictim[actualVictim.length-1]);
     }
 
     @Test
     public void testRemoveOccupant() {
-        DisasterVictim victim2 = new DisasterVictim("John", "Smith", "2005-01-01", "m", "123-456-7890", "2024-01-01");
+        DisasterVictim victim2 = new DisasterVictim("John", "Smith", "2005-01-01", "male", "123-456-7890", "2024-01-01");
         location.addOccupant(victim2); // Ensure the victim is added first
         location.removeOccupant(victim2);
-        DisasterVictim[] actualVictims = location.getOccupants();
+        Occupant[] actualVictims = location.getOccupants();
         int i;
         boolean success = true;
         for (i = 0; i < actualVictims.length; i++) {
@@ -84,7 +84,7 @@ public class LocationTest {
     public void testSetAndGetOccupants() {
         DisasterVictim[] newOccupants = {victim};
         location.setOccupants(newOccupants);
-        DisasterVictim[] actualOccupants = location.getOccupants();
+        Occupant[] actualOccupants = location.getOccupants();
         assertEquals("setOccupants should replace the occupants list with the new list", newOccupants, actualOccupants);
     }
 
@@ -105,7 +105,7 @@ public class LocationTest {
     public void testSetAndGetSupplies() {
         Supply[] newSupplies = { supply };
         location.setSupplies(newSupplies);
-        Supply[] actualSupplies = location.getSupplies();
+        Posession[] actualSupplies = location.getSupplies();
 
         assertEquals("setSupplies should replace the supplies list with the new list", actualSupplies, newSupplies);
     }

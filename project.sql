@@ -8,6 +8,7 @@
 -- \c ensf380project
 
 -- Create tables
+DROP TABLE IF EXISTS Person CASCADE;
 CREATE TABLE Person (
     person_id SERIAL PRIMARY KEY,
     first_name VARCHAR,
@@ -19,12 +20,14 @@ CREATE TABLE Person (
     family_group INT
 );
 
+DROP TABLE IF EXISTS Location CASCADE;
 CREATE TABLE Location (
     location_id SERIAL PRIMARY KEY,
     name VARCHAR,
     address VARCHAR
 );
 
+DROP TABLE IF EXISTS Inquiry CASCADE;
 CREATE TABLE Inquiry (
     inquiry_id SERIAL PRIMARY KEY,
     inquirer_id INT REFERENCES Person(person_id),
@@ -34,12 +37,14 @@ CREATE TABLE Inquiry (
     comments VARCHAR
 );
 
+DROP TABLE IF EXISTS Supply CASCADE;
 CREATE TABLE Supply (
     supply_id SERIAL PRIMARY KEY,
     type VARCHAR,
     comments VARCHAR
 );
 
+DROP TABLE IF EXISTS MedicalRecord CASCADE;
 CREATE TABLE MedicalRecord (
     medical_record_id SERIAL PRIMARY KEY,
     location_id INT REFERENCES Location(location_id),
@@ -49,12 +54,14 @@ CREATE TABLE MedicalRecord (
 );
 
 -- Association tables
+DROP TABLE IF EXISTS PersonLocation CASCADE;
 CREATE TABLE PersonLocation (
     person_id INT REFERENCES Person(person_id),
     location_id INT REFERENCES Location(location_id),
     PRIMARY KEY (person_id, location_id)
 );
 
+DROP TABLE IF EXISTS SupplyAllocation CASCADE;
 CREATE TABLE SupplyAllocation (
     supply_id INT REFERENCES Supply(supply_id),
     person_id INT REFERENCES Person(person_id),

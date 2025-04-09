@@ -29,6 +29,17 @@ public class SupplyTest {
         Supply newSupply = new Supply("different", 5);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testSupplyCtorInvalidId() {
+        Supply newSupply = new Supply(0, "Blanket", 5);
+    }
+
+    @Test
+    public void testGetId() {
+        Supply newSupply = new Supply(100, "Blanket", 5);
+        assertEquals("getId should return the correct id", 100, newSupply.getId());
+    }
+
     @Test
     public void testGetQuantity() {
         assertEquals("getQuantity should return the correct quantity", 5, supply.getQuantity());

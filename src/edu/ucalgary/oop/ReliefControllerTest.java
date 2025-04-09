@@ -2,7 +2,10 @@ package edu.ucalgary.oop;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
+
+import java.sql.SQLException;
 import java.util.Arrays;
 
 public class ReliefControllerTest {
@@ -13,17 +16,20 @@ public class ReliefControllerTest {
 
     @Before
     public void setUp() {
+        TextInputValidator validator = new TextInputValidator("../data/en-CA.xml");
+
         controller = ReliefController.getInstance();
+
         locations = new Location[3];
         locations[0] = new Location("A", "1234 Shelter Ave");
         locations[1] = new Location("B", "4321 Shelter Blvd");
         locations[2] = new Location("C", "5678 Shelter Ct");
 
         people = new Person[4];
-        people[0] = new DisasterVictim("John", "Doe", "2002-01-01", "m", "123-456-7890", "2025-01-01");
-        people[1] = new DisasterVictim("Jane",  "Doe", "2001-01-01", "f", "123-456-7890", "2025-01-01");
-        people[2] = new DisasterVictim("Joe",  "Doe", "2003-01-01", "m", "123-456-7890", "2025-01-01");
-        people[3] = new Person("Jill", "Doe", "2025-01-01", "f", "123-456-7890");
+        people[0] = new DisasterVictim("John", "Doe", "2002-01-01", "male", "123-456-7890", "2025-01-01");
+        people[1] = new DisasterVictim("Jane",  "Doe", "2001-01-01", "female", "123-456-7890", "2025-01-01");
+        people[2] = new DisasterVictim("Joe",  "Doe", "2003-01-01", "male", "123-456-7890", "2025-01-01");
+        people[3] = new Person("Jill", "Doe", "2025-01-01", "female", "123-456-7890");
 
         inquiries = new Inquiry[3];
         inquiries[0] = new Inquiry(people[1], (DisasterVictim) people[0], "2025-01-01", "This is a test inquiry", locations[0]);
@@ -110,7 +116,7 @@ public class ReliefControllerTest {
 
     @Test
     public void testAddDisasterVictimAtomic() {
-        controller.addDisasterVictim("Other", "Person", "2002-01-01", "m", "123-456-7890", locations[0], "2025-01-01");
+        controller.addDisasterVictim("Other", "Person", "2002-01-01", "male", "123-456-7890", locations[0], "2025-01-01");
 
         boolean found = false;
         for (Person person : controller.getPeople()) {
@@ -124,7 +130,7 @@ public class ReliefControllerTest {
 
     @Test
     public void testAddDisasterVictimObject() {
-        DisasterVictim victim = new DisasterVictim("Other", "Person", "2002-01-01", "m", "123-456-7890", "2025-01-01");
+        DisasterVictim victim = new DisasterVictim("Other", "Person", "2002-01-01", "male", "123-456-7890", "2025-01-01");
 
         controller.addDisasterVictim(victim);
 
@@ -170,7 +176,7 @@ public class ReliefControllerTest {
 
     @Test
     public void testAddPersonAtomic() {
-        controller.addPerson("Other", "Person", "2002-01-01", "m", "123-456-7890");
+        controller.addPerson("Other", "Person", "2002-01-01", "male", "123-456-7890");
 
         boolean found = false;
         for (Person person : controller.getPeople()) {
@@ -184,7 +190,7 @@ public class ReliefControllerTest {
 
     @Test
     public void testAddPersonObject() {
-        Person newP = new Person("Other", "Person", "2002-01-01", "m", "123-456-7890");
+        Person newP = new Person("Other", "Person", "2002-01-01", "male", "123-456-7890");
 
         controller.addPerson(newP);
 
@@ -230,7 +236,7 @@ public class ReliefControllerTest {
 
     @Test 
     public void testFetchPersonAtomic() {
-        Person newPerson = new Person("Some", "Name", "2025-02-10", "f", "123-456-7890");
+        Person newPerson = new Person("Some", "Name", "2025-02-10", "female", "123-456-7890");
         controller.addPerson(newPerson);
         Person person = controller.fetchPerson("Some", "Name");
         assertEquals("fetchPerson should return the correct person", newPerson, person);
@@ -286,4 +292,65 @@ public class ReliefControllerTest {
         assertEquals("fetchLocation should return the correct location", locations[1], location);
     }
     
+    @Test
+    public void testLoadLocaitons() {
+        assertNotNull(controller.fetchLocation("TELUS"));   // load is already in setup, check to make sure it was loaded
+    }
+
+    @Test
+    public void testLoadInquiries() {
+        Person inquirer = controller.fetchPerson(3);
+        Occupant missingPerson = controller.fetchVictim(1);
+        String date = "2025-01-01";
+        assertNotNull(controller.fetchInquiry(inquirer, missingPerson, date));   // load is already in setup, check to make sure it was loaded
+    }
+
+    @Test
+    public void testLoadPeople() {
+        assertNotNull(controller.fetchVictim("Aurélie", "Dupont"));   // load is already in setup, check to make sure it was loaded
+    }
+
+    @Test
+    public void testLoadCurrentLocations() {
+        assertEquals(controller.fetchLocation(1), controller.fetchVictim("Aurélie", "Dupont").getCurrentLocation());   // load is already in setup, check to make sure it was loaded
+    }
+
+    @Test
+    public void testLoadFamilyGroups() {   
+        assertEquals(controller.fetchFamilyGroup(1), controller.fetchVictim("Aurélie", "Dupont").getFamilyGroup());   // load is already in setup, check to make sure it was loaded
+    }
+
+    @Test
+    public void testLoadMedicalRecords() {
+        assertNotNull(controller.fetchVictim("Aurélie", "Dupont").getMedicalRecords());
+    }
+
+    @Test
+    public void testLoadSupplies() {
+        assertNotNull(controller.fetchVictim("Aurélie", "Dupont").getSupplies());
+    }
+
+    @Test
+    public void testReflectSupplyTransfer() {
+        DisasterVictim victim = controller.fetchVictim("Aurélie", "Dupont");
+        Posession supply = victim.getCurrentLocation().getSupplies()[0];
+        try{
+            controller.reflectSupplyTransfer(victim, supply);
+        }catch (SQLException e){
+            throw new IllegalArgumentException(e.getMessage());
+        }
+        assertTrue(true);
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testReflectSupplyTransferSupplyNotInLocation() {
+        Supply supply = new Water("okay", 1);
+        DisasterVictim victim = controller.fetchVictim("Aurélie", "Dupont");
+        try{
+            controller.reflectSupplyTransfer(victim, supply);
+        }catch (SQLException e){
+            assertTrue("SQL exception occurred curing supply transfer", false);
+        }
+    }
+
 }

@@ -12,10 +12,10 @@ public class DisasterVictimTest {
 
     @Before
     public void setUp() {
-        victim = new DisasterVictim("Freda", "Kahlo", "2002-01-23", "w", "123-456-7890", "2025-01-23");
+        victim = new DisasterVictim("Freda", "Kahlo", "2002-01-23", "female", "123-456-7890", "2025-01-23");
         otherLocation = new Location("Shelter A", "1234 Shelter Ave");
         currentLocation = new Location("Shelter B", "150 8 Ave NW ");
-        otherSupply = new PersonalBelonging("desc", "comments", 10);
+        otherSupply = new Supply("blanket", 10);
         otherLocation.addSupply(otherSupply);
 
         victim.setCurrentLocation(currentLocation);
@@ -57,7 +57,7 @@ public class DisasterVictimTest {
         victim.addPersonalBelonging(supply);
 
         boolean found = false;
-        for(Supply belonging : victim.getPersonalBelongings()) {
+        for(Posession belonging : victim.getPersonalBelongings()) {
             if(belonging == supply) {
                 found = true;
                 break;
@@ -73,7 +73,7 @@ public class DisasterVictimTest {
         victim.removePersonalBelonging(supply);
 
         boolean found = false;
-        for(Supply belonging : victim.getPersonalBelongings()) {
+        for(Posession belonging : victim.getPersonalBelongings()) {
             if(belonging == supply) {
                 found = true;
                 break;
@@ -130,7 +130,7 @@ public class DisasterVictimTest {
         victim.transferSupply(supplyToTransfer);
 
         boolean found = false;
-        for(Supply belonging : victim.getPersonalBelongings()) {
+        for(Posession belonging : victim.getPersonalBelongings()) {
             if(belonging == supplyToTransfer) {
                 found = true;
                 break;
@@ -154,7 +154,7 @@ public class DisasterVictimTest {
         victim.removeUsedSupplies(currentDate);
 
         boolean found = false;
-        for(Supply belonging : victim.getPersonalBelongings()) {
+        for(Posession belonging : victim.getPersonalBelongings()) {
             if(belonging == expiredSupply) {
                 found = true;
                 break;

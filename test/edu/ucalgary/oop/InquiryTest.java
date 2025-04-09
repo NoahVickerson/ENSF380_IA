@@ -20,13 +20,13 @@ public class InquiryTest {
 
     @Before
     public void setUp() {
-        inquirer = new Person("John", "Doe", validDate, "m", "123-456-7890");
-        expectedInquirer = new Person("James", "Smith", validDate, "m", "123-456-7890");
+        inquirer = new Person("John", "Doe", validDate, "male", "123-456-7890");
+        expectedInquirer = new Person("James", "Smith", validDate, "male", "123-456-7890");
         lastSeen = new Location("University of Calgary", "2500 University Dr NW");
         expectedLastSeen = new Location("UofC", "2500 University Dr NW");
-        victim = new DisasterVictim("Jane", "Doe", validDate, "m", "123-456-7891", "2025-02-10");
+        victim = new DisasterVictim("Jane", "Doe", validDate, "male", "123-456-7891", "2025-02-10");
         inquiry = new Inquiry(inquirer, victim, validDate, expectedInfo, lastSeen);
-        secondVictim = new DisasterVictim("Jane", "Doe", validDate, "m", "123-456-7891", "2025-02-10");
+        secondVictim = new DisasterVictim("Jane", "Doe", validDate, "male", "123-456-7891", "2025-02-10");
     }
 
     @Test 

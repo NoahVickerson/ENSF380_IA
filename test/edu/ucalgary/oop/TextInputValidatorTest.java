@@ -42,9 +42,9 @@ public class TextInputValidatorTest {
             fos = new FileOutputStream("invalid.xml");
             fos.write("invalid".getBytes());
             fos.close();
-            fos = new FileOutputStream("en-CA.xml");
+            fos = new FileOutputStream("new-FILE.xml");
             fos.write(validXml.getBytes());
-            validator = new TextInputValidator("en-CA.xml");
+            validator = new TextInputValidator("new-FILE.xml");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,6 +73,11 @@ public class TextInputValidatorTest {
     @Test
     public void testTranslateToLanguage() {
         assertEquals("Key should translate to language", "Man", validator.translateToLanguage("gender_man"));
+    }
+
+    @Test
+    public void testTranslateToLanguageKeyWithSpace() {
+        assertEquals("Key should translate to language", "Man", validator.translateToLanguage("gender man"));
     }
 
     @Test

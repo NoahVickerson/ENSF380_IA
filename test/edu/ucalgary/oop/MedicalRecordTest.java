@@ -15,7 +15,7 @@ public class MedicalRecordTest {
     private String expectedDateOfTreatment = "2025-01-19";
     private String validDateOfTreatment = "2025-02-04";
     private String inValidDateOfTreatment = "2025/02/04";
-    private DisasterVictim expectedPerson = new DisasterVictim("Freda", "Kahlo", "2002-01-23", "w", "123-456-7890", "2025-01-23");
+    private DisasterVictim expectedPerson = new DisasterVictim("Freda", "Kahlo", "2002-01-23", "female", "123-456-7890", "2025-01-23");
     MedicalRecord medicalRecord = new MedicalRecord(expectedLocation, expectedPerson, expectedTreatmentDetails, expectedDateOfTreatment);
 
 

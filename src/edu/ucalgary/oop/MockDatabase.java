@@ -73,10 +73,10 @@ public class MockDatabase implements DatabaseQueryHandler {
      */
     public int deadEndQuery(String Query, String[] data, String[] types) throws SQLException, IllegalArgumentException {
         if(data == null || types == null) {
-            throw new SQLException("Data and types cannot be null");
+            return 1;
         }
-        if(data.length == 0 || types.length == 0) {
-            throw new SQLException("Data and types cannot be empty");
+        if(data.length != types.length) {
+            throw new SQLException("Data and types length do not match");
         }
         return 1;
     }

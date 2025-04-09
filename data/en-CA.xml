@@ -41,8 +41,38 @@
 </translation>
 
 <translation>
+  <key>refresh</key>
+  <value>Refresh</value>
+</translation>
+
+<translation>
   <key>add_loc</key>
   <value>Add Location</value>
+</translation>
+
+<translation>
+  <key>add_record</key>
+  <value>Add Medical Record</value>
+</translation>
+
+<translation>
+  <key>add_supply</key>
+  <value>Transfer supply from location</value>
+</translation>
+
+<translation>
+  <key>person</key>
+  <value>person</value>
+</translation>
+
+<translation>
+  <key>add_family</key>
+  <value>Add Family Member</value>
+</translation>
+
+<translation>
+  <key>update</key>
+  <value>Update</value>
 </translation>
 
 <!-- error prompts -->
@@ -62,8 +92,48 @@
 </translation>
 
 <translation>
+  <key>create_inquiry_err</key>
+  <value>Error creating inquiry: </value>
+</translation>
+
+<translation>
+  <key>supply_transfer_err</key>
+  <value>Error transferring supply: </value>
+</translation>
+
+<translation>
+  <key>supply_transfer_success</key>
+  <value>Successfully transferred supply</value>
+</translation>
+
+<translation>
   <key>create_location_err</key>
   <value>Error creating location: </value>
+</translation>
+
+<translation>
+  <key>create_supply_err</key>
+  <value>Error creating supply: </value>
+</translation>
+
+<translation>
+  <key>update_person_err</key>
+  <value>Error creating supply: </value>
+</translation>
+
+<translation>
+  <key>add_family_err</key>
+  <value>Error adding family member: </value>
+</translation>
+
+<translation>
+  <key>update_medical_record_err</key>
+  <value>Failed to update medical record: </value>
+</translation>
+
+<translation>
+  <key>update_inquiry_err</key>
+  <value>Failed to update inquiry: </value>
 </translation>
 
 <translation>
@@ -77,23 +147,128 @@
 </translation>
 
 <translation>
+  <key>create_supply_success</key>
+  <value>Supply added successfully</value>
+</translation>
+
+<translation>
+  <key>create_inquiry_success</key>
+  <value>Inquiry added successfully</value>
+</translation>
+
+<translation>
+  <key>update_person_success</key>
+  <value>Person updated successfully</value>
+</translation>
+
+<translation>
+  <key>add_family_success</key>
+  <value>Successfully added family member.</value>
+</translation>
+
+<translation>
+  <key>update_medical_record_success</key>
+  <value>Successfully updated medical records.</value>
+</translation>
+
+<translation>
+  <key>update_inquiry_success</key>
+  <value>Updated inquiry successfully: </value>
+</translation>
+
+<translation>
+  <key>no_locations</key>
+  <value>Must have a location to create medical record.</value>
+</translation>
+
+<translation>
   <key>exit_success</key>
   <value>Thank you for using Relief Service</value>
 </translation>
 
 <translation>
   <key>inv_date</key>
-  <value>Invalid Date Format: </value>
+  <value>Invalid Date Format: should be YYYY-MM-DD</value>
 </translation>
 
 <translation>
-  <key>inv_gender</key>
-  <value>Invalid Gender: </value>
+  <key>inv_phone</key>
+  <value>Invalid Phone Number Format: should be XXX-XXX-XXXX or XXX-XXXX</value>
+</translation>
+
+<translation>
+  <key>inv_family</key>
+  <value>Both members already in family groups</value>
 </translation>
 
 <translation>
   <key>inv_quantity</key>
-  <value>Invalid Quantity: </value>
+  <value>Invalid quantity less than 0.</value>
+</translation>
+
+<translation>
+  <key>inv_grid</key>
+  <value>Invalid Grid: should be a letter followed by a number</value>
+</translation>
+
+<translation>
+  <key>inv_room</key>
+  <value>Invalid Room: should be a number</value>
+</translation>
+
+<translation>
+  <key>inv_gender</key>
+  <value>Invalid Gender</value>
+</translation>
+
+<translation>
+  <key>supply_not_found</key>
+  <value>Supply not in current location.</value>
+</translation>
+
+<translation>
+  <key>same_person</key>
+  <value>Persons cannot be the same.</value>
+</translation>
+
+<translation>
+  <key>db_not_init</key>
+  <value>Database connector has not been initialized.</value>
+</translation>
+
+<translation>
+  <key>person_in_family</key>
+  <value>Person already has a family group</value>
+</translation>
+
+<translation>
+  <key>inq_is_person</key>
+  <value>Inquirer and missing person cannot be the same</value>
+</translation>
+
+<translation>
+  <key>loc_add_belonging</key>
+  <value>Cannot add personal belongings to location.</value>
+</translation>
+
+<translation>
+  <key>inv_room_grid</key>
+  <value>Invalid Room or Grid. Ex. 110 G13</value>
+</translation>
+
+<translation>
+  <key>pb_only_person</key>
+  <value>Can't allocate personal belongings to locations.</value>
+</translation>
+
+<translation>
+  <key>repeat_id</key>
+  <value>ID may not be unique.</value>
+</translation>
+
+<translation>
+  <key>validate</key>
+  <value>Validate</value>
 </translation>
 
 <!-- input options and examples -->
@@ -103,13 +278,23 @@
 </translation>
 
 <translation>
+  <key>male</key>
+  <value>Man</value>
+</translation>
+
+<translation>
   <key>female</key>
   <value>Female</value>
 </translation>
 
 <translation>
+  <key>female</key>
+  <value>Woman</value>
+</translation>
+
+<translation>
   <key>non_binary</key>
-  <value>Non-Binary Person</value>
+  <value>Non-binary person</value>
 </translation>
 
 <translation>
@@ -138,8 +323,8 @@
 </translation>
 
 <translation>
-  <key>belonging</key>
-  <value>Personal Belonging</value>
+  <key>type</key>
+  <value>Type: </value>
 </translation>
 
 <translation>
@@ -179,6 +364,11 @@
 </translation>
 
 <translation>
+  <key>treatment_details</key>
+  <value>Treatment Details:</value>
+</translation>
+
+<translation>
   <key>data_entry</key>
   <value>Enter Data</value>
 </translation>
@@ -196,6 +386,31 @@
 <translation>
   <key>supply</key>
   <value>Supply</value>
+</translation>
+
+<translation>
+  <key>supplies</key>
+  <value>Supplies: </value>
+</translation>
+
+<translation>
+  <key>add_supplies</key>
+  <value>Add Supplies: </value>
+</translation>
+
+<translation>
+  <key>hr</key>
+  <value>-----------------------------</value>
+</translation>
+
+<translation>
+  <key>family_group</key>
+  <value>Family Group:</value>
+</translation>
+
+<translation>
+  <key>details_prompt</key>
+  <value>Treatment Details:</value>
 </translation>
 
 <translation>
@@ -225,13 +440,88 @@
 
 <!-- non dropwodn menu options -->
 <translation>
+  <key>add_family</key>
+  <value>Add Family Members: </value>
+</translation>
+
+<translation>
+  <key>date_of_treatment</key>
+  <value>Date of treatment: </value>
+</translation>
+
+<translation>
+  <key>mvoe_loc</key>
+  <value>Move location: </value>
+</translation>
+
+<translation>
   <key>choose_action</key>
   <value>Choose an action from the dropdown menu: </value>
 </translation>
 
 <translation>
+  <key>medical</key>
+  <value>Medical Records: </value>
+</translation>
+
+<translation>
   <key>choose_type</key>
   <value>What do you want to add to: </value>
+</translation>
+
+<translation>
+  <key>choose_update</key>
+  <value>What do you want to update: </value>
+</translation>
+
+<translation>
+  <key>alloc_date</key>
+  <value>Allocation Date: </value>
+</translation>
+
+<translation>
+  <key>inquirer</key>
+  <value>Inquirer: </value>
+</translation>
+
+<translation>
+  <key>last_loc</key>
+  <value>Last Known Location: </value>
+</translation>
+
+<translation>
+  <key>doi</key>
+  <value>Date of Inquiry: </value>
+</translation>
+
+<translation>
+  <key>address</key>
+  <value>Address: </value>
+</translation>
+
+<translation>
+  <key>pb</key>
+  <value>Personal Belongings: </value>
+</translation>
+
+<translation>
+  <key>personal_belonging</key>
+  <value>Personal Belonging</value>
+</translation>
+
+<translation>
+  <key>move_location</key>
+  <value>Move Location: </value>
+</translation>
+
+<translation>
+  <key>inquiry_immutable</key>
+  <value>Missing person and date of inquiry are immutable fields.</value>
+</translation>
+
+<translation>
+  <key>no_inquiries</key>
+  <value>No inquiries to update.</value>
 </translation>
 
 <translation>
@@ -242,6 +532,11 @@
 <translation>
   <key>lname</key>
   <value>Last Name: </value>
+</translation>
+
+<translation>
+  <key>name</key>
+  <value>Name: </value>
 </translation>
 
 <translation>
@@ -266,7 +561,12 @@
 
 <translation>
   <key>location</key>
-  <value>Current Location:</value>
+  <value>Location</value>
+</translation>
+
+<translation>
+  <key>loc_val</key>
+  <value>Location Validated</value>
 </translation>
 
 <translation>
@@ -282,4 +582,14 @@
 <translation>
   <key>type_prompt</key>
   <value>Choose a type: </value>
+</translation>
+
+<translation>
+  <key>view</key>
+  <value>View</value>
+</translation>
+
+<translation>
+  <key>id</key>
+  <value>ID: </value>
 </translation>

@@ -9,12 +9,27 @@ public class PersonTest {
 
     @Before
     public void setUp() {
-        person = new Person("John", "Doe", "2025-02-10", "m", "123-456-7890");
+        person = new Person("John", "Doe", "2025-02-10", "male", "123-456-7890");
     }
 
     @Test
     public void testCtor() {
         assertNotNull(person);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCtorInvalidDate() {
+        new Person("John", "Doe", "2025/02-31", "male", "123-456-7890");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCtorInvalidGender() {
+        new Person("John", "Doe", "2025-02-10", "x", "123-456-7890");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCtorInvalidPhoneNumber() {
+        new Person("John", "Doe", "2025-02-10", "female", "123-456-789");
     }
 
     @Test
@@ -44,7 +59,7 @@ public class PersonTest {
 
     @Test
     public void testGetGender() {
-        assertEquals("Gender should be m", "m", person.getGender());
+        assertEquals("Gender should be male", "male", person.getGender());
     }
 
     @Test
@@ -87,17 +102,23 @@ public class PersonTest {
         person.setGender("x");
     }
 
+    @Test
+    public void testSetComments() {
+        person.setComments("This is a comment");
+        assertEquals("Person comments should have been updated", "This is a comment", person.getComments());
+    }
+
     @Test 
     public void testSetFamilyGroup() {
-        FamilyGroup familyGroup = new FamilyGroup(new Person("Jane", "Doe", "2025-02-10", "f", "123-456-7890"), new Person("Bill", "Doe", "2025-02-10", "m", "123-456-7890"));
+        FamilyGroup familyGroup = new FamilyGroup(new Person("Jane", "Doe", "2025-02-10", "female", "123-456-7890"), new Person("Bill", "Doe", "2025-02-10", "male", "123-456-7890"));
         person.setFamilyGroup(familyGroup); // should be redundant because the FamilyGroup ctor will do this, but still use for decoupling
         assertEquals("Person should have been added to family group", familyGroup, person.getFamilyGroup());
     }
 
     @Test
     public void testAddFamilyMember()  {
-        Person familyMember = new Person("Jane", "Doe", "2025-02-10", "f", "123-456-7890");
-        FamilyGroup familyGroup = new FamilyGroup(familyMember, new Person("Bill", "Doe", "2025-02-10", "m", "123-456-7890")); // family member should now have this family group
+        Person familyMember = new Person("Jane", "Doe", "2025-02-10", "female", "123-456-7890");
+        FamilyGroup familyGroup = new FamilyGroup(familyMember, new Person("Bill", "Doe", "2025-02-10", "male", "123-456-7890")); // family member should now have this family group
         
 
         person.setFamilyGroup(null);
@@ -109,7 +130,7 @@ public class PersonTest {
 
     @Test 
     public void testSetFamilyMemberRemovesPerson() {
-        FamilyGroup familyGroup = new FamilyGroup(new Person("Jane", "Doe", "2025-02-10", "f", "123-456-7890"), new Person("Bill", "Doe", "2025-02-10", "m", "123-456-7890"));
+        FamilyGroup familyGroup = new FamilyGroup(new Person("Jane", "Doe", "2025-02-10", "female", "123-456-7890"), new Person("Bill", "Doe", "2025-02-10", "male", "123-456-7890"));
         person.setFamilyGroup(familyGroup);
         person.setFamilyGroup(null);
 

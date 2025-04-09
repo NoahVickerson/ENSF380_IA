@@ -5,6 +5,7 @@ import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import java.util.regex.*;
+import java.util.Date;
 
 import java.io.*;
 
@@ -37,7 +38,7 @@ public class ErrorLoggerTest {
         }
         catch (Exception e) {
             logger.logError(e);
-            errorMessage1 = e.toString();
+            errorMessage1 = (new Date()).toString() + ": " + e.toString();
         }
 
         try {

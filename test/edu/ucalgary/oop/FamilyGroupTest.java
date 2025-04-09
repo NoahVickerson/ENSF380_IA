@@ -11,8 +11,8 @@ public class FamilyGroupTest {
 
     @Before
     public void setUp() {
-        person1 = new Person("Jen", "Smith", "2025-02-10", "f", "123-456-7890");
-        person2 = new Person("Bill", "Smith", "2025-02-10", "m", "123-456-7890");
+        person1 = new Person("Jen", "Smith", "2025-02-10", "female", "123-456-7890");
+        person2 = new Person("Bill", "Smith", "2025-02-10", "male", "123-456-7890");
         familyGroup = new FamilyGroup(person1, person2);
     }
 
@@ -36,7 +36,7 @@ public class FamilyGroupTest {
 
     @Test
     public void testAddFamilyMember() {
-        Person newPerson = new Person("Jane", "Doe", "2025-02-10", "f", "123-456-7890");
+        Person newPerson = new Person("Jane", "Doe", "2025-02-10", "female", "123-456-7890");
         familyGroup.addFamilyMember(newPerson);
 
         boolean found = false;
