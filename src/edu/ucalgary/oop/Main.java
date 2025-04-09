@@ -20,41 +20,43 @@ public class Main {
      */
     public static void main(String[] args) {
         // select the proper language
-        String language = "";
-        Scanner cin = new Scanner(System.in);
+         String language = "";
+        // Scanner cin = new Scanner(System.in);
         
-        System.out.println("Enter a language or number from the list: ");
-        System.out.println("Languages: ");
+        // System.out.println("Enter a language or number from the list: ");
+        // System.out.println("Languages: ");
 
-        for(int i = 0; i < languages.length; i++) {
-            System.out.println((i + 1) + ": " + languages[i]);
-        }
+        // for(int i = 0; i < languages.length; i++) {
+        //     System.out.println((i + 1) + ": " + languages[i]);
+        // }
 
-        language = cin.nextLine();
+        // language = cin.nextLine();
 
-        if(language.matches("^\\d+$") && Integer.parseInt(language) > 0 && Integer.parseInt(language) <= languages.length) {
-            language = languages[Integer.parseInt(language) - 1];
-        }else if(language.matches("^[a-z]{2}-[A-Z]{2}$")) {
-            boolean valid = false;
-            for(int i = 0; i < languages.length; i++) {
-                if(languages[i].equals(language)) {
-                    valid = true;
-                }
-            }
+        // if(language.matches("^\\d+$") && Integer.parseInt(language) > 0 && Integer.parseInt(language) <= languages.length) {
+        //     language = languages[Integer.parseInt(language) - 1];
+        // }else if(language.matches("^[a-z]{2}-[A-Z]{2}$")) {
+        //     boolean valid = false;
+        //     for(int i = 0; i < languages.length; i++) {
+        //         if(languages[i].equals(language)) {
+        //             valid = true;
+        //         }
+        //     }
 
-            if(!valid) {
-                System.out.println( language + " is not a valid language.");
-                language = "en-CA";
-            }
-        }else{
-            System.out.println( language + " is not a valid language.");
-            language = "en-CA";
-        }
+        //     if(!valid) {
+        //         System.out.println( language + " is not a valid language.");
+        //         language = "en-CA";
+        //     }
+        // }else{
+        //     System.out.println( language + " is not a valid language.");
+        //     language = "en-CA";
+        // }
 
-        cin.close();
+        // cin.close();
+
         TextInputValidator validator;
 
         try{
+            language = args[0];
             validator = new TextInputValidator("../data/" + language + ".xml");  // get the text file from the data dir
         }catch(Exception e) {
             System.out.println("Invalid language file: " + language + ".xml");

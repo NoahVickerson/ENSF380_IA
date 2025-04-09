@@ -2,7 +2,6 @@ package edu.ucalgary.oop;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.lang.reflect.Array;
 
 import javax.swing.*;
 import java.sql.SQLException;
@@ -52,12 +51,33 @@ public class UserInterface extends JFrame {
 
         }
 
+
         try{
             mainMenu();
         }catch (Exception e) {
             logger.logError(e);
             exit(validator.translateToLanguage("uncaught_exc") + e.getMessage(), 1);
         }
+
+        JButton saveButton = new JButton(validator.translateToLanguage("refresh"));
+
+        this.add(saveButton);
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getContentPane().removeAll();
+                try{
+                    mainMenu();
+                }catch (Exception e1) {
+                    logger.logError(e1);
+                    exit(validator.translateToLanguage("uncaught_exc") + e1.getMessage(), 1);
+                }
+                add(saveButton);
+
+                repaint();
+                revalidate();
+            }
+        });
     }
 
     public void runLoginSequence() {
@@ -146,9 +166,6 @@ public class UserInterface extends JFrame {
             }
         });
 
-        JButton saveButton = new JButton(validator.translateToLanguage("refresh"));
-
-        exitPanel.add(saveButton);
         exitPanel.add(exitButton);
 
         scrollPane.setViewportView(contentPanel);
@@ -166,16 +183,6 @@ public class UserInterface extends JFrame {
                 cl.show(contentPanel, (String) e.getItem());
             }
         });
-
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //removeAll();
-                repaint();
-                revalidate();
-            }
-        });
-
     }
 
     public JPanel dataEntryMenu() {
